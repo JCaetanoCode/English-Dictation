@@ -1352,8 +1352,103 @@ function init() {
     window.speechSynthesis.getVoices();
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
   }
-  renderAll();
+  
+  // 1. Renderiza a tela imediatamente com o que tem no localStorage
+  renderAll(); 
+  
+  // 2. Tenta buscar as frases do GitHub em segundo plano
+  carregarFrasesDoGithub(); 
 }
+
+async function carregarFrasesDoGithub() {
+  console.log("🔍 Buscando frases do GitHub...");
+  try {
+    const res = await fetch('frases/lista.json');
+    
+    if (!res.ok) {
+      console.warn("⚠️ Arquivo 'frases/lista.json' não encontrado. Status:", res.status);
+      return;
+    }
+    
+    const arquivos = await res.json();
+    console.log("📂 Arquivos encontrados na lista:", arquivos);
+
+    let novasTags = {};
+
+    for (const arquivo of arquivos) {
+      const resTxt = await fetch('frases/' + arquivo);
+      if (!resTxt.ok) {
+        console.error(`❌ Erro ao baixar ${arquivo}. Status:`, resTxt.status);
+        continue;
+      }
+      
+      const texto = await resTxt.text();
+      const frases = parseLinesToSentences(texto);
+      const nomeTag = arquivo.replace('.txt', '').toUpperCase();
+      
+      console.log(`✅ Sucesso: ${nomeTag} (${frases.length} frases)`);
+      novasTags[nomeTag] = frases;
+    }
+
+    let adicionouAlgo = false;
+    for (const [tag, frases] of Object.entries(novasTags)) {
+      if (!data.tags[tag]) {
+        data.tags[tag] = frases;
+        adicionouAlgo = true;
+      }
+    }
+    
+    if (adicionouAlgo) {
+      save();
+      renderAll();
+      console.log("🎉 Frases carregadas com sucesso no app!");
+    }
+    
+  } catch (e) {
+    console.error("❌ Erro na requisição:", e);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+async function carregarFrasesDoGithub() {
+  // Só executa se a pasta frases/ existir
+  try {
+    const res = await fetch('frases/lista.json');
+    if (!res.ok) return; // Se não achar o arquivo, ignora silenciosamente
+    
+    const arquivos = await res.json();
+    let novasTags = {};
+
+    for (const arquivo of arquivos) {
+      const resTxt = await fetch('frases/' + arquivo);
+      if (!resTxt.ok) continue;
+      const texto = await resTxt.text();
+      
+      // Usa a mesma função de parse que já existe no seu app
+      const frases = parseLinesToSentences(texto);
+      
+      // O nome da tag será o nome do arquivo (sem o .txt)
+      const nomeTag = arquivo.replace('.txt', '').toUpperCase();
+      novasTags[nomeTag] = frases;
+    }
+
+    // Mescla com os dados atuais (evita duplicar se já existirem)
+    for (const [tag, frases] of Object.entries(novasTags)) {
+      if (!data.tags[tag]) {
+        data.tags[tag] = frases;
+      }
+    }
+    
+    save();
+    renderAll();
+  } catch (e) {
+    console.log("Pasta 'frases' não encontrada ou vazia.");
+  }
+}
+
+// Chame essa função dentro do seu `function init()`:
+// carregarFrasesDoGithub();
 
 document.addEventListener('DOMContentLoaded', init);
 </script>
