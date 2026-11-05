@@ -1,1456 +1,328 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>English Dictation</title>
 <style>
-  :root {
-    --bg-gradient-1: #667eea;
-    --bg-gradient-2: #764ba2;
-    --surface: #ffffff;
-    --surface-2: #f8f9fa;
-    --surface-3: #f1f3f5;
-    --border: #e9ecef;
-    --border-strong: #ced4da;
-    --text: #333333;
-    --text-muted: #6c757d;
-    --text-strong: #495057;
-    --header-bg: #1a1a2e;
-    --header-text: #ffffff;
-    --btn-bg: #e9ecef;
-    --btn-text: #495057;
-    --btn-hover: #dee2e6;
-    --primary: #667eea;
-    --primary-hover: #5568d3;
-    --success: #28a745;
-    --success-hover: #218838;
-    --danger: #dc3545;
-    --danger-hover: #c82333;
-    --warning: #f0ad4e;
-    --warning-hover: #ec971f;
-    --input-border: #ced4da;
-    --input-bg: #ffffff;
-    --input-text: #333333;
-    --correct-bg: #d4edda;
-    --correct-border: #28a745;
-    --correct-text: #155724;
-    --incorrect-bg: #f8d7da;
-    --incorrect-border: #dc3545;
-    --incorrect-text: #721c24;
-    --hint-bg: #fff8e1;
-    --hint-border: #f0d68a;
-    --hint-text: #6c757d;
-    --help-border: #adb5bd;
-    --help-used-bg: #fff3cd;
-    --help-used-border: #f0ad4e;
-    --history-correct-bg: #f0faf2;
-    --history-correct-border: #c3e6cb;
-    --history-incorrect-bg: #fdf2f3;
-    --history-incorrect-border: #f5c6cb;
-    --history-pending-bg: #ffffff;
-    --history-pending-border: #e9ecef;
-    --history-mastered-bg: #fff9e6;
-    --history-mastered-border: #f0d68a;
-    --mastered-badge-bg: #fef3cd;
-    --mastered-badge-text: #856404;
-    --review-bg: #e7f3ff;
-    --review-border: #b6d7ff;
-    --review-text: #004085;
-  }
-
-  [data-theme="dark"] {
-    --bg-gradient-1: #232946;
-    --bg-gradient-2: #121629;
-    --surface: #1f2438;
-    --surface-2: #252b40;
-    --surface-3: #2d344c;
-    --border: #333b52;
-    --border-strong: #444d68;
-    --text: #e4e6eb;
-    --text-muted: #9aa3b8;
-    --text-strong: #c8cdd9;
-    --header-bg: #0f1320;
-    --header-text: #f0f2f5;
-    --btn-bg: #2d344c;
-    --btn-text: #c8cdd9;
-    --btn-hover: #3a4360;
-    --primary: #7c8ff0;
-    --primary-hover: #6879d8;
-    --success: #3dba5a;
-    --success-hover: #34a04e;
-    --danger: #e74c5c;
-    --danger-hover: #d13a4a;
-    --warning: #f0ad4e;
-    --warning-hover: #ec971f;
-    --input-border: #444d68;
-    --input-bg: #141829;
-    --input-text: #e4e6eb;
-    --correct-bg: #143d24;
-    --correct-border: #3dba5a;
-    --correct-text: #a8e6b9;
-    --incorrect-bg: #3d1a20;
-    --incorrect-border: #e74c5c;
-    --incorrect-text: #f5b5bd;
-    --hint-bg: #2e2a17;
-    --hint-border: #6b5b1f;
-    --hint-text: #d4c78a;
-    --help-border: #4a5570;
-    --help-used-bg: #3d3418;
-    --help-used-border: #f0ad4e;
-    --history-correct-bg: #1a3d28;
-    --history-correct-border: #2d5c3d;
-    --history-incorrect-bg: #3a1c22;
-    --history-incorrect-border: #5c2a33;
-    --history-pending-bg: #1f2438;
-    --history-pending-border: #333b52;
-    --history-mastered-bg: #2e2a17;
-    --history-mastered-border: #6b5b1f;
-    --mastered-badge-bg: #3d3418;
-    --mastered-badge-text: #f0d68a;
-    --review-bg: #1a2a3d;
-    --review-border: #2d4a6b;
-    --review-text: #a8d0ff;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
-    min-height: 100vh;
-    padding: 20px;
-    color: var(--text);
-    transition: background 0.3s ease, color 0.3s ease;
-  }
-  .container {
-    max-width: 800px;
-    margin: 0 auto;
-    background: var(--surface);
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    overflow: hidden;
-    transition: background 0.3s ease;
-  }
-  header {
-    background: var(--header-bg);
-    color: var(--header-text);
-    padding: 20px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    transition: background 0.3s ease;
-  }
-  header h1 { font-size: 1.4rem; }
-  .header-right { display: flex; align-items: center; gap: 12px; }
-  .stats { font-size: 0.85rem; opacity: 0.85; }
-  .theme-btn {
-    width: 40px; height: 40px; border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.1);
-    color: var(--header-text); font-size: 1.1rem; cursor: pointer;
-    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
-  }
-  .theme-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.08); }
-
-  .toolbar {
-    padding: 16px 24px; background: var(--surface-2);
-    border-bottom: 1px solid var(--border);
-    display: flex; flex-wrap: wrap; gap: 8px;
-    transition: background 0.3s ease, border-color 0.3s ease;
-  }
-  .btn {
-    padding: 8px 14px; border: none; border-radius: 8px; cursor: pointer;
-    font-size: 0.85rem; font-weight: 500; transition: all 0.2s;
-    background: var(--btn-bg); color: var(--btn-text);
-  }
-  .btn:hover { background: var(--btn-hover); }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-primary { background: var(--primary); color: #fff; }
-  .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
-  .btn-success { background: var(--success); color: #fff; }
-  .btn-success:hover { background: var(--success-hover); }
-  .btn-danger { background: var(--danger); color: #fff; }
-  .btn-danger:hover { background: var(--danger-hover); }
-  .btn-warning { background: var(--warning); color: #fff; }
-  .btn-warning:hover { background: var(--warning-hover); }
-  .btn.active { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--primary); }
-
-  .tag-selector {
-    padding: 16px 24px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-    transition: border-color 0.3s ease;
-  }
-  .tag-selector label { font-weight: 600; font-size: 0.9rem; }
-  select {
-    padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-strong);
-    font-size: 0.9rem; background: var(--input-bg); color: var(--input-text);
-    cursor: pointer; transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-  }
-  .review-toggle {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem;
-    cursor: pointer; user-select: none; padding: 6px 12px; border-radius: 8px;
-    border: 1px solid var(--border); background: var(--surface);
-    color: var(--text-strong); transition: all 0.2s;
-  }
-  .review-toggle:hover { background: var(--surface-3); }
-  .review-toggle.active {
-    background: var(--review-bg); border-color: var(--review-border);
-    color: var(--review-text); font-weight: 600;
-  }
-  .review-toggle input { cursor: pointer; }
-
-  .main { padding: 32px 24px; }
-  .card {
-    background: var(--surface-2); border-radius: 12px;
-    padding: 24px; margin-bottom: 20px; transition: background 0.3s ease;
-  }
-  .audio-section { text-align: center; margin-bottom: 24px; }
-  .speaker-btn {
-    width: 80px; height: 80px; border-radius: 50%; border: none;
-    background: var(--primary); color: #fff; font-size: 2rem; cursor: pointer;
-    transition: all 0.2s; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-  }
-  .speaker-btn:hover { transform: scale(1.08); background: var(--primary-hover); }
-  .speaker-btn:active { transform: scale(0.95); }
-  .speaker-btn.playing { animation: pulse 0.6s ease; }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(102,126,234,0.7); }
-    100% { box-shadow: 0 0 0 25px rgba(102,126,234,0); }
-  }
-
-  .hint-row {
-    margin-top: 16px; display: flex; flex-direction: column;
-    align-items: center; gap: 10px;
-  }
-  .help-btn {
-    width: 44px; height: 44px; border-radius: 50%;
-    border: 2px dashed var(--help-border); background: var(--surface);
-    font-size: 1.2rem; cursor: pointer; transition: all 0.2s;
-    color: var(--text-muted); display: flex; align-items: center; justify-content: center;
-  }
-  .help-btn:hover:not(:disabled) {
-    border-color: var(--warning); background: var(--hint-bg);
-    transform: scale(1.08); color: var(--mastered-badge-text);
-  }
-  .help-btn:disabled { cursor: not-allowed; opacity: 0.4; }
-  .help-btn.used {
-    border-style: solid; border-color: var(--help-used-border);
-    background: var(--help-used-bg); opacity: 1;
-  }
-  .translation-hint {
-    font-size: 0.9rem; color: var(--hint-text); font-style: italic;
-    background: var(--hint-bg); border: 1px solid var(--hint-border);
-    border-radius: 8px; padding: 8px 14px; max-width: 90%;
-    animation: fadeIn 0.3s ease;
-  }
-  .translation-hint.hidden { display: none; }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .input-section { position: relative; }
-  input[type="text"] {
-    width: 100%; padding: 16px; font-size: 1.1rem;
-    border: 2px solid var(--input-border); border-radius: 10px;
-    outline: none; transition: all 0.2s; background: var(--input-bg); color: var(--input-text);
-  }
-  input[type="text"]:focus { border-color: var(--primary); }
-  input[type="text"].correct {
-    border-color: var(--correct-border); background: var(--correct-bg); color: var(--correct-text);
-  }
-  input[type="text"].incorrect {
-    border-color: var(--incorrect-border); background: var(--incorrect-bg); color: var(--incorrect-text);
-  }
-  input[type="text"]:disabled { cursor: not-allowed; opacity: 0.9; }
-
-  .feedback {
-    margin-top: 16px; padding: 16px; border-radius: 10px;
-    font-weight: 500; display: none;
-  }
-  .feedback.success {
-    display: block; background: var(--correct-bg);
-    color: var(--correct-text); border: 1px solid var(--correct-border);
-  }
-  .feedback.error {
-    display: block; background: var(--incorrect-bg);
-    color: var(--incorrect-text); border: 1px solid var(--incorrect-border);
-  }
-  .feedback .correct-answer {
-    display: block; margin-top: 8px; font-size: 1rem; font-style: italic;
-  }
-  .feedback .streak-info { display: block; margin-top: 6px; font-size: 0.85rem; opacity: 0.85; }
-
-  .actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
-  .actions .btn { padding: 12px 20px; font-size: 0.95rem; }
-
-  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
-  .empty-state h2 { margin-bottom: 12px; color: var(--text-strong); }
-  .empty-state .celebrate { font-size: 3rem; margin-bottom: 16px; }
-
-  .progress-info { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); }
-  .progress-info .streak {
-    display: inline-block; margin-left: 6px; padding: 2px 8px;
-    border-radius: 10px; background: var(--mastered-badge-bg);
-    color: var(--mastered-badge-text); font-weight: 600; font-size: 0.75rem;
-  }
-    
-  /* ---------- Histórico (Acordeão) ---------- */
-  .history-panel {
-    background: var(--surface-2);
-    border-radius: 12px;
-    transition: background 0.3s ease;
-    overflow: hidden;
-  }
-  .history-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 20px;
-    cursor: pointer;
-    user-select: none;
-    background: var(--surface-2);
-    transition: background 0.2s ease;
-  }
-  .history-header:hover { background: var(--surface-3); }
-  
-  .history-title-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .history-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text-strong);
-  }
-  .history-arrow {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    transition: transform 0.3s ease;
-  }
-  .history-panel.open .history-arrow { transform: rotate(180deg); }
-
-  .history-summary {
-    display: flex;
-    gap: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-  
-  .history-content-wrapper {
-    max-height: 0;
-    transition: max-height 0.3s ease-out;
-  }
-  .history-panel.open .history-content-wrapper {
-    max-height: 500px; /* altura máxima para animar */
-  }
-
-  .history-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 0 20px 20px 20px;
-  }
-  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
-  .history-title { font-size: 1rem; font-weight: 600; color: var(--text-strong); }
-  .history-summary { display: flex; gap: 14px; font-size: 0.85rem; font-weight: 600; }
-  .summary-item { display: flex; align-items: center; gap: 4px; }
-  .summary-item.correct { color: var(--success); }
-  .summary-item.incorrect { color: var(--danger); }
-  .summary-item.pending { color: var(--text-muted); }
-  .summary-item.mastered { color: var(--warning); }
-
-  .history-list {
-    display: flex; flex-direction: column; gap: 6px;
-    max-height: 420px; overflow-y: auto; padding-right: 4px;
-  }
-  .history-list::-webkit-scrollbar { width: 6px; }
-  .history-list::-webkit-scrollbar-track { background: transparent; }
-  .history-list::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
-
-  .history-item {
-    display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
-    border-radius: 8px; border: 1px solid var(--history-pending-border);
-    background: var(--history-pending-bg); transition: all 0.2s;
-  }
-  .history-item.correct { border-color: var(--history-correct-border); background: var(--history-correct-bg); }
-  .history-item.incorrect { border-color: var(--history-incorrect-border); background: var(--history-incorrect-bg); }
-  .history-item.mastered { border-color: var(--history-mastered-border); background: var(--history-mastered-bg); }
-  .history-item.current { box-shadow: 0 0 0 2px var(--primary); }
-
-  .history-icon {
-    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.75rem; font-weight: 700; color: #fff; margin-top: 1px;
-  }
-  .history-icon.correct { background: var(--success); }
-  .history-icon.incorrect { background: var(--danger); }
-  .history-icon.mastered { background: var(--warning); font-size: 0.7rem; }
-  .history-icon.pending { background: transparent; border: 1.5px solid var(--text-muted); color: var(--text-muted); }
-
-  .history-content { flex: 1; min-width: 0; }
-  .history-text { font-size: 0.9rem; color: var(--text); word-break: break-word; line-height: 1.35; }
-  .history-item.pending .history-text { color: var(--text-muted); letter-spacing: 1px; font-family: monospace; }
-  .history-translation { font-size: 0.78rem; color: var(--text-muted); font-style: italic; margin-top: 2px; }
-  .history-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
-  .history-item.pending .history-translation { visibility: hidden; }
-
-  .mastered-badge {
-    display: inline-block; font-size: 0.68rem; padding: 1px 6px;
-    border-radius: 8px; background: var(--mastered-badge-bg);
-    color: var(--mastered-badge-text); font-weight: 600;
-    margin-left: 6px; vertical-align: middle;
-  }
-
-  .streak-dots { display: inline-flex; gap: 3px; margin-left: 6px; vertical-align: middle; }
-  .streak-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-strong); }
-  .streak-dot.filled { background: var(--success); }
-
-  .modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-    z-index: 100; justify-content: center; align-items: center; padding: 20px;
-  }
-  .modal-overlay.active { display: flex; }
-  .modal {
-    background: var(--surface); color: var(--text); border-radius: 12px;
-    max-width: 700px; width: 100%; max-height: 90vh; overflow: auto; padding: 24px;
-    transition: background 0.3s ease, color 0.3s ease;
-  }
-  .modal h2 { margin-bottom: 16px; }
-  .modal textarea {
-    width: 100%; min-height: 250px; padding: 12px; font-family: monospace;
-    font-size: 0.9rem; border: 1px solid var(--border-strong); border-radius: 8px;
-    resize: vertical; background: var(--input-bg); color: var(--input-text);
-  }
-  .modal .hint { font-size: 0.8rem; color: var(--text-muted); margin: 8px 0; }
-  .modal-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
-
-  .hidden-file-input { display: none; }
-
-  @media (max-width: 500px) {
-    header h1 { font-size: 1.1rem; }
-    .speaker-btn { width: 64px; height: 64px; font-size: 1.6rem; }
-    .main { padding: 20px 16px; }
-    .history-summary { gap: 10px; font-size: 0.8rem; }
-  }
+:root{--bg:#0f172a;--hd:#1e293b;--card:#1e293b;--bd:#334155;--tx:#e2e8f0;--mut:#94a3b8;--pri:#6366f1;--ok:#4ade80;--okbg:#06281a;--er:#fb7185;--erbg:#3b0f1c;--in:#0f172a;color-scheme:dark}
+@media (prefers-color-scheme:light){:root{--bg:#f1f5f9;--hd:#fff;--card:#fff;--bd:#cbd5e1;--tx:#0f172a;--mut:#64748b;--ok:#15803d;--okbg:#dcfce7;--er:#be123c;--erbg:#ffe4e6;--in:#f8fafc;color-scheme:light}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--tx);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:var(--hd);border-bottom:1px solid var(--bd);padding:10px 16px}
+.hd{max-width:660px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand b{display:block;font-size:16px}.brand small{color:var(--mut);font-size:11px}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.btn{background:var(--in);border:1px solid var(--bd);border-radius:8px;padding:7px 12px;font-weight:600;font-size:12px}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+main{max-width:660px;margin:28px auto;padding:0 16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:22px}
+.bar{height:5px;border-radius:4px;background:var(--in);overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;width:0;background:var(--pri);transition:width .3s}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.pill,.sel{background:var(--in);border:1px solid var(--bd);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600}
+.sel{max-width:170px}
+.spk{display:block;margin:22px auto 6px;width:84px;height:84px;border-radius:50%;border:0;background:var(--pri);color:#fff;font-size:34px;box-shadow:0 8px 24px rgba(99,102,241,.4)}
+.spk.on{animation:pulse .8s infinite alternate}
+@keyframes pulse{to{transform:scale(1.07)}}
+@media (prefers-reduced-motion:reduce){.spk.on{animation:none}}
+.keys{text-align:center;color:var(--mut);font-size:11px}
+.stats{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:14px 0 8px}
+.mt{grid-column:1/-1;color:var(--mut);font-size:11px;margin:-2px 0 6px}
+.st{border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700}
+.st.a{background:var(--okbg);color:var(--ok)}.st.e{background:var(--erbg);color:var(--er)}
+.hint{display:block;margin:0 auto 14px;background:none;border:0;color:var(--mut);font-size:12px;text-align:center;width:100%}
+textarea{width:100%;min-height:96px;resize:vertical;background:var(--in);border:2px solid var(--bd);border-radius:12px;padding:12px;font-size:15px}
+textarea.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+textarea.err{background:var(--erbg);border-color:var(--er);color:var(--er)}
+.res{margin-top:14px;border-radius:12px;padding:14px;border:1px solid}
+.res.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+.res.err{background:var(--erbg);border-color:var(--er);color:var(--er)}
+.res h3{margin:0 0 8px;font-size:14px}
+.diff{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0;color:var(--tx)}
+.w{border:1px solid var(--bd);border-radius:5px;padding:1px 7px;font-weight:600}
+.w.k{border-color:var(--ok);color:var(--ok)}
+.w.x{border-color:var(--er);color:var(--er);text-decoration:line-through}
+.w.m{border-color:var(--er);color:var(--tx)}
+.chk{width:100%;margin-top:14px;padding:13px;border:0;border-radius:10px;background:var(--pri);color:#fff;font-weight:700}
+.chk:disabled{background:var(--bd);color:var(--mut);cursor:not-allowed}
+.nav{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--bd);margin-top:18px;padding-top:16px}
+.lnk{background:none;border:0;color:var(--mut);font-size:12px}
+.empty{text-align:center;padding:40px 10px;color:var(--mut)}
+dialog{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:14px;padding:20px;width:min(640px,94vw);max-height:88vh}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+dialog h2{margin:0 0 4px;font-size:17px}dialog p{color:var(--mut);margin:0 0 12px;font-size:12px}
+.grp{border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:12px}
+.grp h4{margin:0 0 8px;font-size:13px}.grp .row{justify-content:flex-start}
+.hdm{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+input[type=text],.f{background:var(--in);border:1px solid var(--bd);border-radius:8px;padding:7px 9px;min-width:0}
+.add{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-bottom:6px}
+.add select{grid-column:1/3}
+.pl{display:grid;grid-template-columns:1fr 1fr 110px auto;gap:6px;margin-bottom:6px}
+@media (max-width:560px){.pl{grid-template-columns:1fr 1fr}.add{grid-template-columns:1fr}.add select{grid-column:auto}}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--pri);color:#fff;border-radius:8px;padding:9px 16px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;z-index:99}
+.toast.show{opacity:1}
+footer{text-align:center;color:var(--mut);font-size:11px;padding:24px 0 calc(24px + env(safe-area-inset-bottom,0px))}
 </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <h1>🎧 English Dictation</h1>
-    <div class="header-right">
-      <div class="stats" id="stats"></div>
-      <button class="theme-btn" id="btnTheme" title="Alternar tema">🌙</button>
-    </div>
-  </header>
+<header><div class="hd">
+  <div class="brand"><b>English Dictation</b><small>Prática de listening e escrita</small></div>
+  <div><button class="btn" id="bBackup">Dados &amp; backup</button> <button class="btn pri" id="bManage">Gerenciar frases</button></div>
+</div></header>
 
-  <div class="toolbar">
-    <button class="btn btn-primary" id="btnManage">📝 Gerenciar Frases</button>
-    <button class="btn" id="btnImportJson">📥 Importar JSON</button>
-    <button class="btn" id="btnExportJson">📤 Exportar JSON</button>
-    <button class="btn" id="btnImportTxt">📄 Importar TXT</button>
-    <button class="btn" id="btnExportTxt">📄 Exportar TXT</button>
-    <button class="btn btn-danger" id="btnReset">🔄 Resetar</button>
+<main><div class="card" id="card">
+  <div class="bar"><i id="prog"></i></div>
+  <div class="row">
+    <div class="row"><span class="pill" id="count"></span><select class="sel" id="tagSel" aria-label="Filtrar por tag"></select><select class="sel" id="modeSel" aria-label="Modo de estudo"><option value="pend">Pendentes</option><option value="err">Só erros</option><option value="rev">Revisão</option><option value="dom">Dominadas</option></select></div>
+    <div class="row"><button class="pill" id="speed" title="Velocidade">1x</button><select class="sel" id="voice" aria-label="Voz"></select></div>
   </div>
-
-  <div class="tag-selector">
-    <label for="tagSelect">Tag:</label>
-    <select id="tagSelect"></select>
-    <button class="btn btn-success" id="btnAddTag">+ Nova Tag</button>
-    <button class="btn btn-danger" id="btnDelTag">- Excluir Tag</button>
-    <label class="review-toggle" id="reviewToggleLabel" title="Mostra também as frases já dominadas">
-      <input type="checkbox" id="reviewMode">
-      <span>Modo revisão</span>
-    </label>
-  </div>
-
-  <div class="main" id="mainContent"></div>
-</div>
-
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <h2>Gerenciar Frases</h2>
-    <p class="hint">Uma frase por linha. Formato: <code>English sentence | Tradução</code> (tradução opcional).</p>
-    <textarea id="sentencesTextarea" spellcheck="false"></textarea>
-    <p class="hint" id="modalInfo"></p>
-    <div class="modal-actions">
-      <button class="btn" id="btnCancelModal">Cancelar</button>
-      <button class="btn btn-primary" id="btnSaveSentences">Salvar</button>
+  <div id="empty" class="empty" hidden>Nenhuma frase nesta tag. Adicione frases em “Gerenciar frases” ou importe um arquivo em “Dados &amp; backup”.</div>
+  <div id="work">
+    <button class="spk" id="spk" aria-label="Ouvir frase">&#128266;</button>
+    <div class="keys">[ Espaço / Ctrl+P ]</div>
+    <div class="stats"><span class="st a">Acertos: <b id="nOk">0</b></span><span class="st e">Erros: <b id="nEr">0</b></span></div>
+    <div class="stats" id="panel" style="margin-top:0"></div>
+    <div class="keys" id="badge" style="margin-bottom:8px"></div>
+    <button class="hint" id="hint">Mostrar tradução</button>
+    <textarea id="ans" placeholder="Digite o que você ouviu em inglês…" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+    <div id="res"></div>
+    <button class="chk" id="chk">Verificar resposta (Enter)</button>
+    <div class="nav">
+      <button class="btn" id="prev">&larr; Anterior</button>
+      <button class="lnk" id="redo">&#8635; Reiniciar</button>
+      <button class="btn" id="next">Próxima &rarr;</button>
     </div>
   </div>
-</div>
+</div></main>
+<footer>English Dictation · ferramenta de estudo individual</footer>
 
-<input type="file" id="fileJson" class="hidden-file-input" accept=".json,application/json">
-<input type="file" id="fileTxt" class="hidden-file-input" accept=".txt,text/plain">
+<dialog id="dBackup">
+  <div class="hdm"><h2>Dados &amp; backup</h2><button class="btn" data-close>Fechar</button></div>
+  <div class="grp"><h4>Backup completo (JSON)</h4><p>Tags, frases, traduções e progresso. Importar substitui todos os dados atuais.</p>
+    <div class="row"><button class="btn pri" id="exJson">Exportar JSON</button><button class="btn" id="imJson">Importar JSON</button></div></div>
+  <div class="grp"><h4>Texto puro (TXT)</h4><p>Uma frase por linha: <code>How’s the weather | Como está o tempo</code>. A tradução é opcional. Importar adiciona as frases à tag selecionada (ou “Geral”).</p>
+    <div class="row"><button class="btn pri" id="exTxt">Exportar TXT</button><button class="btn" id="imTxt">Importar TXT</button></div></div>
+  <input type="file" id="fJson" accept=".json,application/json" hidden>
+  <input type="file" id="fTxt" accept=".txt,text/plain" hidden>
+</dialog>
+
+<dialog id="dManage">
+  <div class="hdm"><h2>Gerenciar frases</h2><button class="btn" data-close>Fechar</button></div>
+  <div class="grp"><h4>Tag</h4>
+    <div class="row"><select class="f" id="mTag" aria-label="Tag selecionada"></select><button class="btn" id="mTagDel">Excluir tag e frases</button></div>
+    <div class="row" style="margin-top:8px"><input type="text" id="nTagName" placeholder="Nova tag"><button class="btn" id="nTagAdd">Criar tag</button></div></div>
+  <div class="grp"><h4>Nova frase nesta tag</h4>
+    <div class="add"><input type="text" id="nText" placeholder="Inglês"><input type="text" id="nTr" placeholder="Português (opcional)"><button class="btn pri" id="nAdd">Adicionar</button></div></div>
+  <div id="plist"></div>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
 
 <script>
-const STORAGE_KEY = 'english-dictation-data-v1';
-const THEME_KEY = 'english-dictation-theme';
-const REVIEW_KEY = 'english-dictation-review-mode';
+const KEY='englishDictation.v1';
+const $=id=>document.getElementById(id);
+const norm=s=>s.toLowerCase().replace(/[’‘]/g,"'").replace(/[^\p{L}\p{N}\s]/gu,'').replace(/\s+/g,' ').trim();
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const mk=(text,translation,tag)=>({id:uid(),text,translation:translation||'',tag:tag||'Geral',status:null,answer:'',hits:0,miss:0,streak:0,due:null});
+function seed(){return{version:1,tags:['Geral','Cotidiano'],phrases:[
+  mk("I would like a cup of coffee, please.","Eu gostaria de uma xícara de café, por favor."),
+  mk("How’s the weather today?","Como está o tempo hoje?","Cotidiano"),
+  mk("Where is the nearest bus stop?","Onde fica o ponto de ônibus mais próximo?","Cotidiano"),
+  mk("I have been studying English for two years.","Estudo inglês há dois anos."),
+  mk("Could you speak a little slower, please?","Você poderia falar um pouco mais devagar, por favor?")]}}
+const MASTER=3,INT=[3,7,15,30],DAY=864e5,LBL={new:'Nova',learn:'Aprendendo',dom:'Dominada'};
+const st=p=>p.hits+p.miss===0?'new':p.streak>=MASTER?'dom':'learn';
+const dueNow=p=>st(p)==='dom'&&(!p.due||p.due<=Date.now());
+const MODES={pend:p=>st(p)!=='dom',err:p=>st(p)==='learn'&&p.miss>0,rev:dueNow,dom:p=>st(p)==='dom'};
+let db=load(),filter='all',mode='pend',pin=null,idx=0,speed=1,hintOn=false,voices=[];
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&Array.isArray(r.phrases))return fix(r)}catch(e){}return seed()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
+function fix(r){
+  r.phrases=r.phrases.filter(p=>p&&typeof p.text==='string'&&p.text.trim()).map(p=>({id:p.id||uid(),text:p.text.trim(),translation:(p.translation||'').trim(),tag:p.tag||'Geral',status:null,answer:'',hits:+p.hits||(p.status==='ok'?1:0),miss:+p.miss||(p.status==='err'?1:0),streak:+p.streak||(p.status==='ok'?1:0),due:+p.due||null}));
+  const t=new Set(Array.isArray(r.tags)?r.tags:[]);r.phrases.forEach(p=>t.add(p.tag));if(!t.size)t.add('Geral');
+  r.tags=[...t];r.version=1;return r}
+const inTag=p=>filter==='all'||p.tag===filter;
+const list=()=>db.phrases.filter(p=>inTag(p)&&(p.id===pin||MODES[mode](p)));
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2600)}
 
-const MASTERY_THRESHOLD = 3;               // acertos consecutivos necessários
-const MASTERY_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24h
+function words(s){return s.split(/\s+/).map(w=>({raw:w,n:norm(w)})).filter(w=>w.n)}
+function diff(a,b){ // a = resposta do usuário, b = frase correta
+  const m=a.length,n=b.length,L=Array.from({length:m+1},()=>new Array(n+1).fill(0));
+  for(let i=m-1;i>=0;i--)for(let j=n-1;j>=0;j--)L[i][j]=a[i].n===b[j].n?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
+  const out=[];let i=0,j=0;
+  while(i<m&&j<n){
+    if(a[i].n===b[j].n){out.push(['k',b[j].raw]);i++;j++}
+    else if(L[i+1][j]>=L[i][j+1]){out.push(['x',a[i].raw]);i++}
+    else{out.push(['m',b[j].raw]);j++}}
+  while(i<m)out.push(['x',a[i++].raw]);
+  while(j<n)out.push(['m',b[j++].raw]);
+  return out}
 
-let data = { tags: {} };
-let currentTag = null;
-let currentIndex = 0;
-let currentPhase = 'idle';
-let reviewMode = false;
-let historyOpen = false; // <--- Adicione esta linha
-
-const $ = id => document.getElementById(id);
-
-/* ---------- Tema ---------- */
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  const btn = $('btnTheme');
-  if (btn) {
-    btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-    btn.title = theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro';
-  }
-  localStorage.setItem(THEME_KEY, theme);
-}
-function toggleTheme() {
-  const cur = document.documentElement.getAttribute('data-theme') || 'light';
-  applyTheme(cur === 'dark' ? 'light' : 'dark');
-}
-function initTheme() {
-  const saved = localStorage.getItem(THEME_KEY);
-  if (saved === 'dark' || saved === 'light') applyTheme(saved);
-  else {
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    applyTheme(prefersDark ? 'dark' : 'light');
-  }
-}
-
-/* ---------- Persistência ---------- */
-function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
-function load() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      data = JSON.parse(raw);
-      if (!data.tags) data.tags = {};
+function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+function render(){
+  const L=list();if(idx>=L.length)idx=Math.max(0,L.length-1);
+  const p=L[idx];
+  const ts=$('tagSel');ts.innerHTML='';
+  [['all','Todas as tags'],...db.tags.map(t=>[t,t])].forEach(([v,l])=>{const o=el('option',null,l);o.value=v;ts.appendChild(o)});
+  ts.value=filter;
+  $('prog').style.width=L.length?((idx+1)/L.length*100)+'%':'0';
+  $('count').textContent=L.length?`Frase ${idx+1} de ${L.length}`:'Sem frases';
+  const T=db.phrases.filter(inTag),c=k=>T.filter(x=>st(x)===k).length;
+  $('nOk').textContent=T.reduce((s,x)=>s+x.hits,0);
+  $('nEr').textContent=T.reduce((s,x)=>s+x.miss,0);
+  $('panel').innerHTML=[['Novas',c('new')],['Aprendendo',c('learn')],['Dominadas',c('dom')],['Para revisar',T.filter(dueNow).length]].map(([l,n])=>`<span class="pill">${l}: <b>${n}</b></span>`).join('');
+  $('empty').textContent=db.phrases.length?'Nenhuma frase neste modo. Troque o modo de estudo ou a tag.':'Nenhuma frase cadastrada. Adicione em “Gerenciar frases” ou importe um arquivo em “Dados & backup”.';
+  $('empty').hidden=!!p;$('work').hidden=!p;
+  if(!p)return;
+  const s=st(p);
+  $('badge').textContent=`${LBL[s]} · ${p.hits} acertos · ${p.miss} erros`+(s==='dom'?(dueNow(p)?' · revisão pendente':` · revisão em ${Math.ceil((p.due-Date.now())/DAY)}d`):'');
+  $('hint').textContent=hintOn?(p.translation||'Sem tradução cadastrada'):'Mostrar tradução';
+  const a=$('ans'),res=$('res');res.innerHTML='';
+  a.className='';
+  if(p.status){
+    a.value=p.answer;a.disabled=true;a.classList.add(p.status==='ok'?'ok':'err');
+    const box=el('div','res '+(p.status==='ok'?'ok':'err'));
+    if(p.status==='ok'){
+      box.appendChild(el('h3',null,'Correto! Muito bem.'));
+      box.appendChild(el('div',null,p.text));
+    }else{
+      box.appendChild(el('h3',null,'Resposta incorreta'));
+      const d=el('div','diff');
+      diff(words(p.answer),words(p.text)).forEach(([k,w])=>d.appendChild(el('span','w '+k,k==='m'?'+ '+w:w)));
+      box.appendChild(d);
+      box.appendChild(el('div',null,'Frase correta: '+p.text));
     }
-  } catch (e) { data = { tags: {} }; }
+    if(p.translation)box.appendChild(el('div',null,'Tradução: '+p.translation));
+    res.appendChild(box);
+  }else{a.value='';a.disabled=false}
+  $('chk').disabled=!!p.status;
+  $('prev').disabled=idx===0;$('next').disabled=idx>=L.length-1;
 }
-
-/* ---------- Normalização (Regra de negócio: contrações) ---------- */
-function normalize(str) {
-  let s = String(str).toLowerCase();
-  
-  // Remove pontuações primeiro (exceto apóstrofo, que usaremos agora)
-  s = s.replace(/[.,;:!?"`´\-—–_/()\[\]{}]/g, '');
-  
-  // Normaliza apóstrofos (todos os tipos → apóstrofo reto)
-  s = s.replace(/[’‘`´]/g, "'");
-  
-  // ---- Expansão de contrações ----
-  
-  // Casos especiais primeiro (mais específicos)
-  const special = {
-    "won't": "will not",
-    "can't": "can not",
-    "cannot": "can not",
-    "shan't": "shall not",
-    "let's": "let us",
-    "y'all": "you all",
-    "ain't": "is not"
-  };
-  for (const [key, val] of Object.entries(special)) {
-    const re = new RegExp('\\b' + key + '\\b', 'g');
-    s = s.replace(re, val);
-  }
-  
-  // n't → not (pega don't, doesn't, didn't, isn't, aren't, wasn't, weren't,
-  //           haven't, hasn't, hadn't, couldn't, shouldn't, wouldn't, mustn't)
-  s = s.replace(/n't\b/g, " not");
-  
-  // 's → is, mas SOMENTE depois de pronomes/interrogativos comuns
-  // (evita "John's car" → "john is car")
-  const sPronouns = "i|you|he|she|it|we|they|who|what|where|when|why|how|there|here|that|this";
-  s = s.replace(new RegExp("\\b(" + sPronouns + ")'s\\b", "g"), "$1 is");
-  
-  // 're → are
-  s = s.replace(/'re\b/g, " are");
-  
-  // 'm → am
-  s = s.replace(/'m\b/g, " am");
-  
-  // 'll → will
-  s = s.replace(/'ll\b/g, " will");
-  
-  // 've → have
-  s = s.replace(/'ve\b/g, " have");
-  
-  // 'd → would (mais comum em estudo; 'd também pode ser had)
-  s = s.replace(/'d\b/g, " would");
-
-  // ---- Tolerância a erros comuns de digitação (sem apóstrofo) ----
-  // Aplicado depois da expansão para evitar conflitos
-  s = s
-    .replace(/\bim\b/g, "i am")
-    .replace(/\byoure\b/g, "you are")
-    .replace(/\btheyre\b/g, "they are")
-    .replace(/\bhes\b/g, "he is")
-    .replace(/\bshes\b/g, "she is")
-    .replace(/\bdont\b/g, "do not")
-    .replace(/\bdidnt\b/g, "did not")
-    .replace(/\bdoesnt\b/g, "does not")
-    .replace(/\bisnt\b/g, "is not")
-    .replace(/\barent\b/g, "are not")
-    .replace(/\bcant\b/g, "can not")
-    .replace(/\bwont\b/g, "will not");
-  
-  // Normaliza espaços finais
-  s = s.replace(/\s+/g, ' ').trim();
-  
-  return s;
+function check(){
+  const p=list()[idx],a=$('ans');
+  if(!p||p.status||!a.value.trim())return;
+  p.answer=a.value.trim();const ok=norm(p.answer)===norm(p.text);p.status=ok?'ok':'err';
+  if(ok){p.hits++;p.streak++;if(p.streak>=MASTER){p.due=Date.now()+INT[Math.min(p.streak-MASTER,INT.length-1)]*DAY;if(p.streak===MASTER)toast('Frase dominada! Primeira revisão em 3 dias.')}}
+  else{p.miss++;p.streak=0;p.due=null}
+  pin=p.id;
+  save();render();
 }
-
-function uid() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-}
-
-/* ---------- Repetição espaçada: helpers ---------- */
-function isMastered(s) {
-  if (!s.masteredUntil) return false;
-  return s.masteredUntil > Date.now();
-}
-function timeUntilAvailable(s) {
-  if (!s.masteredUntil) return 0;
-  const remaining = s.masteredUntil - Date.now();
-  return remaining > 0 ? remaining : 0;
-}
-function formatDuration(ms) {
-  const totalMin = Math.ceil(ms / 60000);
-  if (totalMin < 60) return `${totalMin}min`;
-  const hours = Math.floor(totalMin / 60);
-  const mins = totalMin % 60;
-  return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
-}
-
-function getStudyList() {
-  const list = data.tags[currentTag] || [];
-  if (reviewMode) return list;
-  return list.filter(s => !isMastered(s));
-}
-
-function findNextStudyIndex(direction) {
-  const study = getStudyList();
-  if (study.length === 0) return -1;
-  const fullList = data.tags[currentTag] || [];
-  let idx = currentIndex;
-  for (let i = 0; i < fullList.length; i++) {
-    idx = (idx + direction + fullList.length) % fullList.length;
-    const s = fullList[idx];
-    if (reviewMode || !isMastered(s)) return idx;
-  }
-  return -1;
-}
-
-/* ---------- Seed ---------- */
-function seedIfEmpty() {
-  const hasAny = Object.values(data.tags).some(arr => arr.length > 0);
-  if (!hasAny) {
-    data.tags['Básico'] = [
-      { id: uid(), text: "How's the weather today?", translation: "Como está o tempo hoje?", attempts: 0, correct: 0, consecutiveCorrect: 0 },
-      { id: uid(), text: "I would like a cup of coffee, please.", translation: "Eu gostaria de uma xícara de café, por favor.", attempts: 0, correct: 0, consecutiveCorrect: 0 },
-      { id: uid(), text: "Where are you from?", translation: "De onde você é?", attempts: 0, correct: 0, consecutiveCorrect: 0 },
-      { id: uid(), text: "She doesn't like to wake up early.", translation: "Ela não gosta de acordar cedo.", attempts: 0, correct: 0, consecutiveCorrect: 0 },
-      { id: uid(), text: "What time does the meeting start?", translation: "A que horas começa a reunião?", attempts: 0, correct: 0, consecutiveCorrect: 0 },
-    ];
-    if (!currentTag || !data.tags[currentTag]) currentTag = 'Básico';
-    save();
-  }
-  Object.values(data.tags).forEach(arr => arr.forEach(s => {
-    if (typeof s.consecutiveCorrect !== 'number') s.consecutiveCorrect = 0;
-  }));
-}
-
-/* ---------- Stats ---------- */
-function renderStats() {
-  const tagList = Object.keys(data.tags);
-  let total = 0, correct = 0, mastered = 0;
-  tagList.forEach(t => data.tags[t].forEach(s => {
-    total++;
-    if (s.lastResult === 'correct') correct++;
-    if (isMastered(s)) mastered++;
-  }));
-  $('stats').textContent = `${tagList.length} tag(s) · ${total} frase(s) · ${mastered} dominada(s)`;
-}
-
-function renderTagSelect() {
-  const sel = $('tagSelect');
-  sel.innerHTML = '';
-  const tags = Object.keys(data.tags);
-  if (tags.length === 0) {
-    const opt = document.createElement('option');
-    opt.textContent = '(nenhuma tag)';
-    opt.value = '';
-    sel.appendChild(opt);
-    return;
-  }
-  if (!currentTag || !data.tags[currentTag]) currentTag = tags[0];
-  tags.forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t;
-    const masteredCount = data.tags[t].filter(isMastered).length;
-    const suffix = masteredCount > 0 ? ` · ${masteredCount}🏆` : '';
-    opt.textContent = `${t} (${data.tags[t].length})${suffix}`;
-    if (t === currentTag) opt.selected = true;
-    sel.appendChild(opt);
-  });
-}
-
-/* ---------- Render principal ---------- */
-function renderMain() {
-  const main = $('mainContent');
-  const fullList = data.tags[currentTag] || [];
-
-  if (fullList.length === 0) {
-    main.innerHTML = `
-      <div class="empty-state">
-        <h2>Nenhuma frase nesta tag</h2>
-        <p>Use "Gerenciar Frases" ou importe um arquivo TXT/JSON para começar.</p>
-      </div>`;
-    renderStats();
-    return;
-  }
-
-  if (!reviewMode && isMastered(fullList[currentIndex] || {})) {
-    const nextIdx = findNextStudyIndex(1);
-    if (nextIdx === -1) { renderAllMastered(); return; }
-    currentIndex = nextIdx;
-  }
-
-  if (!reviewMode && getStudyList().length === 0) {
-    renderAllMastered();
-    return;
-  }
-
-  if (currentIndex >= fullList.length) currentIndex = 0;
-  const s = fullList[currentIndex];
-
-  const wasChecked = currentPhase === 'checked';
-  const lastResult = s.lastResult;
-
-  const streak = s.consecutiveCorrect || 0;
-  const streakDots = Array.from({ length: MASTERY_THRESHOLD }, (_, i) =>
-    `<span class="streak-dot ${i < streak ? 'filled' : ''}"></span>`
-  ).join('');
-
-  main.innerHTML = `
-    <div class="card">
-      <div class="audio-section">
-        <button class="speaker-btn" id="btnSpeak" title="Ouvir pronúncia">🔊</button>
-        ${s.translation ? `
-          <div class="hint-row">
-            <button class="help-btn" id="btnHelp" title="Mostrar tradução (dica)">💡</button>
-            <div class="translation-hint hidden" id="translationHint">
-              <strong>Dica:</strong> ${escapeHtml(s.translation)}
-            </div>
-          </div>
-        ` : ''}
-      </div>
-
-      <div class="input-section">
-        <input type="text" id="answerInput" placeholder="Digite a frase em inglês..." autocomplete="off" spellcheck="false">
-        <div class="feedback" id="feedback"></div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-primary" id="btnCheck">Verificar</button>
-        <button class="btn" id="btnNext">Próxima →</button>
-        <button class="btn" id="btnPrev">← Anterior</button>
-      </div>
-
-      <div class="progress-info">
-        Frase ${currentIndex + 1} de ${fullList.length}
-        ${s.attempts ? ` · Tentativas: ${s.attempts} · Acertos: ${s.correct}` : ''}
-        <span class="streak" title="Acertos consecutivos: ${streak}/${MASTERY_THRESHOLD}">${streak}/${MASTERY_THRESHOLD} ${streakDots}</span>
-      </div>
-    </div>
-
-    <div id="historyContainer"></div>
-  `;
-
-  const input = $('answerInput');
-  const feedback = $('feedback');
-  const btnCheck = $('btnCheck');
-  const btnHelp = $('btnHelp');
-  const translationHint = $('translationHint');
-
-  if (wasChecked && lastResult) {
-    if (lastResult === 'correct') {
-      input.value = s.text;
-      input.classList.add('correct');
-      input.disabled = true;
-      feedback.className = 'feedback success';
-      feedback.innerHTML = `✅ Correto! Muito bem!`;
-    } else {
-      input.classList.add('incorrect');
-      input.disabled = true;
-      feedback.className = 'feedback error';
-      feedback.innerHTML = `❌ Resposta incorreta.<span class="correct-answer">Resposta correta: <strong>${escapeHtml(s.text)}</strong></span>`;
-    }
-    btnCheck.disabled = true;
-    if (btnHelp) {
-      btnHelp.disabled = true;
-      btnHelp.classList.add('used');
-    }
-    if (translationHint) translationHint.classList.remove('hidden');
-  } else {
-    currentPhase = 'idle';
-    input.focus();
-  }
-
-  $('btnSpeak').addEventListener('click', () => speak(s.text, $('btnSpeak')));
-
-  if (btnHelp && translationHint) {
-    btnHelp.addEventListener('click', () => {
-      if (btnHelp.disabled) return;
-      translationHint.classList.remove('hidden');
-      btnHelp.disabled = true;
-      btnHelp.classList.add('used');
-      btnHelp.title = 'Tradução revelada';
-      input.focus();
-    });
-  }
-
-  btnCheck.addEventListener('click', () => {
-    if (currentPhase === 'checked') return;
-    checkAnswer(s, input, feedback, btnCheck);
-  });
-
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && currentPhase !== 'checked') {
-      checkAnswer(s, input, feedback, btnCheck);
-    }
-  });
-
-  $('btnNext').addEventListener('click', goNext);
-  $('btnPrev').addEventListener('click', goPrev);
-
-  renderHistory();
-  renderStats();
-}
-
-function renderAllMastered() {
-  const main = $('mainContent');
-  const list = data.tags[currentTag] || [];
-
-  let minRemaining = Infinity;
-  list.forEach(s => {
-    const r = timeUntilAvailable(s);
-    if (r > 0 && r < minRemaining) minRemaining = r;
-  });
-  const waitText = minRemaining !== Infinity ? formatDuration(minRemaining) : '—';
-
-  main.innerHTML = `
-    <div class="card">
-      <div class="empty-state">
-        <div class="celebrate">🎉</div>
-        <h2>Você dominou todas as frases desta tag!</h2>
-        <p>Volte em aproximadamente <strong>${waitText}</strong> para revisar, ou ative o <strong>Modo revisão</strong> acima para estudar agora mesmo.</p>
-      </div>
-    </div>
-    <div id="historyContainer"></div>
-  `;
-  renderHistory();
-  renderStats();
-}
-
-function goNext() {
-  const fullList = data.tags[currentTag] || [];
-  if (fullList.length === 0) return;
-  const target = findNextStudyIndex(1);
-  if (target === -1) { renderAllMastered(); return; }
-  currentIndex = target;
-  currentPhase = 'idle';
-  renderMain();
-}
-
-function goPrev() {
-  const fullList = data.tags[currentTag] || [];
-  if (fullList.length === 0) return;
-  const target = findNextStudyIndex(-1);
-  if (target === -1) { renderAllMastered(); return; }
-  currentIndex = target;
-  currentPhase = 'idle';
-  renderMain();
-}
-
-/* ---------- Histórico ---------- */
-function renderHistory() {
-  const container = $('historyContainer');
-  if (!container) return;
-  const list = data.tags[currentTag] || [];
-  if (list.length === 0) { container.innerHTML = ''; return; }
-
-  let countCorrect = 0, countIncorrect = 0, countPending = 0, countMastered = 0;
-  list.forEach(s => {
-    if (isMastered(s)) countMastered++;
-    else if (s.lastResult === 'correct') countCorrect++;
-    else if (s.lastResult === 'incorrect') countIncorrect++;
-    else countPending++;
-  });
-
-  const itemsHtml = list.map((s, idx) => {
-    const isCurrent = idx === currentIndex;
-    const mastered = isMastered(s);
-    let statusClass, iconHtml, textHtml;
-
-    if (mastered) {
-      statusClass = 'mastered';
-      iconHtml = `<span class="history-icon mastered">🏆</span>`;
-      textHtml = escapeHtml(s.text);
-    } else if (s.lastResult === 'correct') {
-      statusClass = 'correct';
-      iconHtml = `<span class="history-icon correct">✓</span>`;
-      textHtml = escapeHtml(s.text);
-    } else if (s.lastResult === 'incorrect') {
-      statusClass = 'incorrect';
-      iconHtml = `<span class="history-icon incorrect">✕</span>`;
-      textHtml = escapeHtml(s.text);
-    } else {
-      statusClass = 'pending';
-      iconHtml = `<span class="history-icon pending">•</span>`;
-      const maskLen = Math.max(6, Math.min(30, s.text.length));
-      textHtml = '•'.repeat(maskLen);
-    }
-
-    const metaParts = [];
-    if (s.attempts > 0) metaParts.push(`Tentativas: ${s.attempts}`);
-    if (s.correct > 0) metaParts.push(`Acertos: ${s.correct}`);
-    if (!mastered && (s.consecutiveCorrect || 0) > 0) {
-      metaParts.push(`Seguidos: ${s.consecutiveCorrect}/${MASTERY_THRESHOLD}`);
-    }
-    if (mastered) {
-      metaParts.push(`Volta em ${formatDuration(timeUntilAvailable(s))}`);
-    }
-    const metaHtml = metaParts.length ? `<div class="history-meta">${metaParts.join(' · ')}</div>` : '';
-
-    const translationHtml = s.translation ? `<div class="history-translation">${escapeHtml(s.translation)}</div>` : '';
-    const badge = mastered ? `<span class="mastered-badge">Dominada</span>` : '';
-
-    return `
-      <div class="history-item ${statusClass} ${isCurrent ? 'current' : ''}">
-        ${iconHtml}
-        <div class="history-content">
-          <div class="history-text">${textHtml}${badge}</div>
-          ${translationHtml}
-          ${metaHtml}
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  const openClass = historyOpen ? 'open' : '';
-
-  container.innerHTML = `
-    <div class="history-panel ${openClass}" id="historyPanel">
-      <div class="history-header" id="historyHeaderToggle">
-        <div class="history-title-wrapper">
-          <div class="history-title">📋 Histórico de estudo</div>
-          <div class="history-arrow">▼</div>
-        </div>
-        <div class="history-summary">
-          <span class="summary-item mastered">🏆 ${countMastered}</span>
-          <span class="summary-item correct">✓ ${countCorrect}</span>
-          <span class="summary-item incorrect">✕ ${countIncorrect}</span>
-          <span class="summary-item pending">• ${countPending}</span>
-        </div>
-      </div>
-      <div class="history-content-wrapper">
-        <div class="history-list">${itemsHtml}</div>
-      </div>
-    </div>
-  `;
-
-  // Adiciona o evento de clique para abrir/fechar
-  const toggleBtn = $('historyHeaderToggle');
-  const panel = $('historyPanel');
-  if (toggleBtn && panel) {
-    toggleBtn.addEventListener('click', () => {
-      historyOpen = !historyOpen;
-      panel.classList.toggle('open', historyOpen);
-    });
-  }
-
-}
-
-/* ---------- Verificação ---------- */
-function checkAnswer(s, input, feedback, btnCheck) {
-  const userRaw = input.value;
-  if (userRaw.trim() === '') { input.focus(); return; }
-
-  const user = normalize(userRaw);
-  const target = normalize(s.text);
-  s.attempts = (s.attempts || 0) + 1;
-  s.consecutiveCorrect = s.consecutiveCorrect || 0;
-
-  let streakMsg = '';
-
-  if (user === target) {
-    s.correct = (s.correct || 0) + 1;
-    s.lastResult = 'correct';
-    s.consecutiveCorrect++;
-    input.classList.add('correct');
-    input.value = s.text;
-    feedback.className = 'feedback success';
-    feedback.innerHTML = `✅ Correto! Muito bem!`;
-
-    if (s.consecutiveCorrect >= MASTERY_THRESHOLD) {
-      s.masteredUntil = Date.now() + MASTERY_COOLDOWN_MS;
-      streakMsg = `🏆 Frase dominada! Volta em ${formatDuration(MASTERY_COOLDOWN_MS)}.`;
-    } else {
-      streakMsg = `Acertos consecutivos: ${s.consecutiveCorrect}/${MASTERY_THRESHOLD}.`;
-    }
-  } else {
-    s.lastResult = 'incorrect';
-    s.consecutiveCorrect = 0;
-    input.classList.add('incorrect');
-    feedback.className = 'feedback error';
-    feedback.innerHTML = `❌ Resposta incorreta.<span class="correct-answer">Resposta correta: <strong>${escapeHtml(s.text)}</strong></span>`;
-    streakMsg = 'Sequência de acertos zerada.';
-  }
-
-  if (streakMsg) {
-    feedback.innerHTML += `<span class="streak-info">${streakMsg}</span>`;
-  }
-
-  input.disabled = true;
-  btnCheck.disabled = true;
-
-  const btnHelp = $('btnHelp');
-  if (btnHelp) { btnHelp.disabled = true; btnHelp.classList.add('used'); }
-  const translationHint = $('translationHint');
-  if (translationHint) translationHint.classList.remove('hidden');
-
-  currentPhase = 'checked';
-  save();
-  renderStats();
-  renderTagSelect();
-
-  const info = document.querySelector('.progress-info');
-  if (info) {
-    const fullList = data.tags[currentTag];
-    const streak = s.consecutiveCorrect || 0;
-    const streakDots = Array.from({ length: MASTERY_THRESHOLD }, (_, i) =>
-      `<span class="streak-dot ${i < streak ? 'filled' : ''}"></span>`
-    ).join('');
-    info.innerHTML = `Frase ${currentIndex + 1} de ${fullList.length} · Tentativas: ${s.attempts} · Acertos: ${s.correct} <span class="streak">${streak}/${MASTERY_THRESHOLD} ${streakDots}</span>`;
-  }
-
-  renderHistory();
-}
-
-/* ---------- Speech ---------- */
-function speak(text, btn) {
-  if (!('speechSynthesis' in window)) {
-    alert('Seu navegador não suporta síntese de voz.');
-    return;
-  }
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US';
-  u.rate = 0.9;
-  const voices = window.speechSynthesis.getVoices();
-  const enVoice = voices.find(v => /en[-_]US/i.test(v.lang)) || voices.find(v => /^en/i.test(v.lang));
-  if (enVoice) u.voice = enVoice;
-
-  btn.classList.add('playing');
-  u.onend = () => btn.classList.remove('playing');
-  u.onerror = () => btn.classList.remove('playing');
-  window.speechSynthesis.speak(u);
-}
-
-/* ---------- Utils ---------- */
-function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]));
-}
-
-/* ---------- Tags ---------- */
-function addTag() {
-  const name = prompt('Nome da nova tag:');
-  if (!name) return;
-  const trimmed = name.trim();
-  if (!trimmed) return;
-  if (data.tags[trimmed]) { alert('Já existe uma tag com esse nome.'); return; }
-  data.tags[trimmed] = [];
-  currentTag = trimmed;
-  currentIndex = 0;
-  currentPhase = 'idle';
-  save();
-  renderAll();
-}
-
-function deleteTag() {
-  const tags = Object.keys(data.tags);
-  if (tags.length <= 1) { alert('Você precisa ter pelo menos uma tag.'); return; }
-  if (!confirm(`Excluir a tag "${currentTag}" e todas as suas frases?`)) return;
-  delete data.tags[currentTag];
-  currentTag = Object.keys(data.tags)[0];
-  currentIndex = 0;
-  currentPhase = 'idle';
-  save();
-  renderAll();
-}
-
-/* ---------- Modal ---------- */
-function openModal() {
-  const list = data.tags[currentTag] || [];
-  const txt = list.map(s => s.translation ? `${s.text} | ${s.translation}` : s.text).join('\n');
-  $('sentencesTextarea').value = txt;
-  $('modalInfo').textContent = `${list.length} frase(s) na tag "${currentTag}"`;
-  $('modalOverlay').classList.add('active');
-}
-function closeModal() { $('modalOverlay').classList.remove('active'); }
-
-function parseLinesToSentences(text) {
-  const lines = text.split(/\r?\n/);
-  const out = [];
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-    if (trimmed.startsWith('#')) continue;
-    const idx = trimmed.indexOf('|');
-    let eng, pt;
-    if (idx >= 0) {
-      eng = trimmed.slice(0, idx).trim();
-      pt = trimmed.slice(idx + 1).trim();
-    } else {
-      eng = trimmed;
-      pt = '';
-    }
-    if (!eng) continue;
-    out.push({ id: uid(), text: eng, translation: pt, attempts: 0, correct: 0, consecutiveCorrect: 0 });
-  }
-  return out;
-}
-
-function saveSentences() {
-  const list = parseLinesToSentences($('sentencesTextarea').value);
-  const oldList = data.tags[currentTag] || [];
-  const oldMap = new Map(oldList.map(s => [s.text, s]));
-  const merged = list.map(ns => {
-    const old = oldMap.get(ns.text);
-    if (old) {
-      return {
-        ...ns,
-        attempts: old.attempts || 0,
-        correct: old.correct || 0,
-        lastResult: old.lastResult,
-        consecutiveCorrect: old.consecutiveCorrect || 0,
-        masteredUntil: old.masteredUntil
-      };
-    }
-    return ns;
-  });
-  data.tags[currentTag] = merged;
-  currentIndex = 0;
-  currentPhase = 'idle';
-  save();
-  closeModal();
-  renderAll();
-}
-
-/* ---------- JSON ---------- */
-function exportJson() {
-  const payload = { version: 2, exportedAt: new Date().toISOString(), data };
-  downloadBlob(JSON.stringify(payload, null, 2), `english-dictation-backup-${timestamp()}.json`, 'application/json');
-}
-
-function importJson(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const parsed = JSON.parse(reader.result);
-      let tags = null;
-      if (parsed && parsed.data && parsed.data.tags) tags = parsed.data.tags;
-      else if (parsed && parsed.tags) tags = parsed.tags;
-      else if (parsed && typeof parsed === 'object') tags = parsed;
-
-      if (!tags || typeof tags !== 'object') throw new Error('Estrutura inválida.');
-
-      const clean = {};
-      for (const [tag, arr] of Object.entries(tags)) {
-        if (!Array.isArray(arr)) continue;
-        clean[tag] = arr
-          .filter(s => s && typeof s.text === 'string' && s.text.trim() !== '')
-          .map(s => ({
-            id: s.id || uid(),
-            text: s.text.trim(),
-            translation: (s.translation || '').trim(),
-            attempts: Number(s.attempts) || 0,
-            correct: Number(s.correct) || 0,
-            lastResult: s.lastResult === 'correct' || s.lastResult === 'incorrect' ? s.lastResult : undefined,
-            consecutiveCorrect: Number(s.consecutiveCorrect) || 0,
-            masteredUntil: Number(s.masteredUntil) || undefined
-          }));
-      }
-
-      if (Object.keys(clean).length === 0) throw new Error('Nenhuma tag encontrada.');
-      if (!confirm('Isso substituirá TODOS os dados atuais. Continuar?')) return;
-
-      data = { tags: clean };
-      currentTag = Object.keys(data.tags)[0];
-      currentIndex = 0;
-      currentPhase = 'idle';
-      save();
-      renderAll();
-      alert('Importação JSON concluída!');
-    } catch (err) {
-      alert('Erro ao importar JSON: ' + err.message);
-    }
-  };
-  reader.readAsText(file);
-}
-
-/* ---------- TXT ---------- */
-function exportTxt() {
-  const list = data.tags[currentTag] || [];
-  if (list.length === 0) { alert('Nenhuma frase nesta tag para exportar.'); return; }
-  const lines = list.map(s => s.translation ? `${s.text} | ${s.translation}` : s.text);
-  downloadBlob(lines.join('\n'), `frases-${currentTag}-${timestamp()}.txt`, 'text/plain');
-}
-
-function importTxt(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    const sentences = parseLinesToSentences(reader.result);
-    if (sentences.length === 0) { alert('Nenhuma frase válida encontrada no arquivo.'); return; }
-    const tagName = prompt(
-      `Importar ${sentences.length} frase(s) para qual tag?\n(Deixe em branco para criar uma nova tag "Importado ${timestamp()}")`,
-      currentTag || ''
-    );
-    if (tagName === null) return;
-    let targetTag = tagName.trim();
-    if (!targetTag) targetTag = `Importado ${timestamp()}`;
-    if (!data.tags[targetTag]) data.tags[targetTag] = [];
-    data.tags[targetTag] = data.tags[targetTag].concat(sentences);
-    currentTag = targetTag;
-    currentIndex = 0;
-    currentPhase = 'idle';
-    save();
-    renderAll();
-    alert(`Importação TXT concluída: ${sentences.length} frase(s) adicionada(s) em "${targetTag}".`);
-  };
-  reader.readAsText(file);
-}
-
-/* ---------- Helpers ---------- */
-function timestamp() {
-  const d = new Date();
-  const pad = n => String(n).padStart(2, '0');
-  return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
-}
-
-function downloadBlob(content, filename, mime) {
-  const blob = new Blob([content], { type: mime + ';charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-/* ---------- Reset ---------- */
-function resetAll() {
-  if (!confirm('Isso apagará TODOS os dados (tags, frases e progresso). Continuar?')) return;
-  data = { tags: {} };
-  currentTag = null;
-  currentIndex = 0;
-  currentPhase = 'idle';
-  seedIfEmpty();
-  save();
-  renderAll();
-}
-
-/* ---------- Render geral ---------- */
-function renderAll() {
-  renderTagSelect();
-  renderMain();
-}
-
-/* ---------- Eventos ---------- */
-function bindGlobalEvents() {
-  $('btnTheme').addEventListener('click', toggleTheme);
-  $('btnManage').addEventListener('click', () => {
-    if (!currentTag) { alert('Crie uma tag primeiro.'); return; }
-    openModal();
-  });
-  $('btnCancelModal').addEventListener('click', closeModal);
-  $('btnSaveSentences').addEventListener('click', saveSentences);
-  $('modalOverlay').addEventListener('click', e => {
-    if (e.target === $('modalOverlay')) closeModal();
-  });
-
-  $('btnAddTag').addEventListener('click', addTag);
-  $('btnDelTag').addEventListener('click', deleteTag);
-
-  $('tagSelect').addEventListener('change', e => {
-    currentTag = e.target.value;
-    currentIndex = 0;
-    currentPhase = 'idle';
-    renderAll();
-  });
-
-  const reviewChk = $('reviewMode');
-  reviewChk.checked = reviewMode;
-  $('reviewToggleLabel').classList.toggle('active', reviewMode);
-  reviewChk.addEventListener('change', e => {
-    reviewMode = e.target.checked;
-    localStorage.setItem(REVIEW_KEY, reviewMode ? '1' : '0');
-    $('reviewToggleLabel').classList.toggle('active', reviewMode);
-    currentIndex = 0;
-    currentPhase = 'idle';
-    renderAll();
-  });
-
-  $('btnExportJson').addEventListener('click', exportJson);
-  $('btnImportJson').addEventListener('click', () => $('fileJson').click());
-  $('fileJson').addEventListener('change', e => {
-    const f = e.target.files[0];
-    if (f) importJson(f);
-    e.target.value = '';
-  });
-
-  $('btnExportTxt').addEventListener('click', exportTxt);
-  $('btnImportTxt').addEventListener('click', () => $('fileTxt').click());
-  $('fileTxt').addEventListener('change', e => {
-    const f = e.target.files[0];
-    if (f) importTxt(f);
-    e.target.value = '';
-  });
-
-  $('btnReset').addEventListener('click', resetAll);
-}
-
-/* ---------- Init ---------- */
-function init() {
-  initTheme();
-  load();
-  seedIfEmpty();
-
-  reviewMode = localStorage.getItem(REVIEW_KEY) === '1';
-
-  bindGlobalEvents();
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-  }
-  
-  // 1. Renderiza a tela imediatamente com o que tem no localStorage
-  renderAll(); 
-  
-  // 2. Tenta buscar as frases do GitHub em segundo plano
-  carregarFrasesDoGithub(); 
-}
-
-async function carregarFrasesDoGithub() {
-  console.log("🔍 Buscando frases do GitHub...");
-  try {
-    const res = await fetch('frases/lista.json');
-    
-    if (!res.ok) {
-      console.warn("⚠️ Arquivo 'frases/lista.json' não encontrado. Status:", res.status);
-      return;
-    }
-    
-    const arquivos = await res.json();
-    console.log("📂 Arquivos encontrados na lista:", arquivos);
-
-    let novasTags = {};
-
-    for (const arquivo of arquivos) {
-      const resTxt = await fetch('frases/' + arquivo);
-      if (!resTxt.ok) {
-        console.error(`❌ Erro ao baixar ${arquivo}. Status:`, resTxt.status);
-        continue;
-      }
-      
-      const texto = await resTxt.text();
-      const frases = parseLinesToSentences(texto);
-      const nomeTag = arquivo.replace('.txt', '').toUpperCase();
-      
-      console.log(`✅ Sucesso: ${nomeTag} (${frases.length} frases)`);
-      novasTags[nomeTag] = frases;
-    }
-
-    let adicionouAlgo = false;
-    for (const [tag, frases] of Object.entries(novasTags)) {
-      if (!data.tags[tag]) {
-        data.tags[tag] = frases;
-        adicionouAlgo = true;
-      }
-    }
-    
-    if (adicionouAlgo) {
-      save();
-      renderAll();
-      console.log("🎉 Frases carregadas com sucesso no app!");
-    }
-    
-  } catch (e) {
-    console.error("❌ Erro na requisição:", e);
-  }
-}
-
-document.addEventListener('DOMContentLoaded', init);
-
-async function carregarFrasesDoGithub() {
-  // Só executa se a pasta frases/ existir
-  try {
-    const res = await fetch('frases/lista.json');
-    if (!res.ok) return; // Se não achar o arquivo, ignora silenciosamente
-    
-    const arquivos = await res.json();
-    let novasTags = {};
-
-    for (const arquivo of arquivos) {
-      const resTxt = await fetch('frases/' + arquivo);
-      if (!resTxt.ok) continue;
-      const texto = await resTxt.text();
-      
-      // Usa a mesma função de parse que já existe no seu app
-      const frases = parseLinesToSentences(texto);
-      
-      // O nome da tag será o nome do arquivo (sem o .txt)
-      const nomeTag = arquivo.replace('.txt', '').toUpperCase();
-      novasTags[nomeTag] = frases;
-    }
-
-    // Mescla com os dados atuais (evita duplicar se já existirem)
-    for (const [tag, frases] of Object.entries(novasTags)) {
-      if (!data.tags[tag]) {
-        data.tags[tag] = frases;
-      }
-    }
-    
-    save();
-    renderAll();
-  } catch (e) {
-    console.log("Pasta 'frases' não encontrada ou vazia.");
-  }
-}
-
-// Chame essa função dentro do seu `function init()`:
-// carregarFrasesDoGithub();
-
-document.addEventListener('DOMContentLoaded', init);
+function go(d){const t=list()[idx+d];if(!t)return;pin=null;idx=Math.max(0,list().indexOf(t));hintOn=false;render();if(!$('ans').disabled)$('ans').focus()}
+
+/* áudio */
+function loadVoices(){
+  voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+  const s=$('voice'),cur=s.value;s.innerHTML='';
+  const d=el('option',null,'Voz padrão (EN)');d.value='';s.appendChild(d);
+  voices.forEach(v=>{const o=el('option',null,`${v.name} (${v.lang})`);o.value=v.name;s.appendChild(o)});
+  s.value=cur}
+function speak(){
+  const p=list()[idx];if(!p)return;
+  if(!('speechSynthesis' in window)){toast('Seu navegador não suporta síntese de voz.');return}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(p.text);u.lang='en-US';u.rate=speed;
+  const v=voices.find(v=>v.name===$('voice').value);if(v){u.voice=v;u.lang=v.lang}
+  const b=$('spk');b.classList.add('on');u.onend=u.onerror=()=>b.classList.remove('on');
+  speechSynthesis.speak(u)}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+
+/* download / upload */
+function download(name,text,type){
+  const a=el('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+const stamp=()=>new Date().toISOString().slice(0,10);
+function readFile(input,cb){
+  const f=input.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{cb(String(r.result));input.value=''};r.onerror=()=>toast('Não foi possível ler o arquivo.');r.readAsText(f,'utf-8')}
+
+$('exJson').onclick=()=>{download(`english-dictation-backup-${stamp()}.json`,JSON.stringify(db,null,2),'application/json');toast('Backup exportado.')};
+$('imJson').onclick=()=>$('fJson').click();
+$('fJson').onchange=e=>readFile(e.target,txt=>{
+  try{
+    const d=JSON.parse(txt);
+    if(!d||!Array.isArray(d.phrases))throw 0;
+    db=fix(d);save();filter='all';idx=0;hintOn=false;render();renderManage();toast(`Backup importado: ${db.phrases.length} frases.`);
+  }catch(err){toast('JSON inválido: faltou a lista "phrases".')}});
+$('exTxt').onclick=()=>{
+  download(`english-dictation-frases-${stamp()}.txt`,db.phrases.map(p=>p.translation?`${p.text} | ${p.translation}`:p.text).join('\n'),'text/plain');
+  toast('TXT exportado.')};
+$('imTxt').onclick=()=>$('fTxt').click();
+$('fTxt').onchange=e=>readFile(e.target,txt=>{
+  const tag=filter==='all'?'Geral':filter;let c=0;
+  txt.replace(/^\uFEFF/,'').split(/\r?\n/).forEach(line=>{
+    line=line.trim();if(!line)return;
+    const k=line.indexOf('|');
+    const en=(k<0?line:line.slice(0,k)).trim(),pt=k<0?'':line.slice(k+1).trim();
+    if(!en)return;db.phrases.push(mk(en,pt,tag));c++});
+  if(!db.tags.includes(tag))db.tags.push(tag);
+  save();render();renderManage();toast(`${c} frases importadas.`)});
+
+/* gerenciar */
+function tagOptions(sel,val){sel.innerHTML='';db.tags.forEach(t=>{const o=el('option',null,t);o.value=t;sel.appendChild(o)});if(val)sel.value=val}
+let mTag='';
+function renderManage(){
+  if(!db.tags.includes(mTag))mTag=db.tags[0];
+  tagOptions($('mTag'),mTag);
+  const box=$('plist');box.innerHTML='';
+  const items=db.phrases.filter(p=>p.tag===mTag);
+  if(!items.length){box.appendChild(el('p',null,'Nenhuma frase nesta tag.'));return}
+  items.forEach(p=>{
+    const r=el('div','pl');r.dataset.id=p.id;
+    const a=el('input','f');a.type='text';a.value=p.text;a.dataset.f='text';a.setAttribute('aria-label','Inglês');
+    const b=el('input','f');b.type='text';b.value=p.translation;b.dataset.f='translation';b.placeholder='Tradução';b.setAttribute('aria-label','Tradução');
+    const s=el('select','f');s.dataset.f='tag';tagOptions(s,p.tag);s.setAttribute('aria-label','Tag');
+    const d=el('button','btn','Excluir');d.dataset.del=p.id;
+    const i=el('div','mt',`${LBL[st(p)]} · ${p.hits} acertos · ${p.miss} erros`);
+    r.append(a,b,s,d,i);box.appendChild(r)})}
+$('plist').addEventListener('change',e=>{
+  const f=e.target.dataset.f,row=e.target.closest('.pl');if(!f||!row)return;
+  const p=db.phrases.find(x=>x.id===row.dataset.id);if(!p)return;
+  const v=e.target.value.trim();
+  if(f==='text'){if(!v){e.target.value=p.text;return}if(v!==p.text){p.text=v;p.status=null;p.answer=''}}
+  else p[f]=v;
+  save();render();if(f==='tag')renderManage()});
+$('plist').addEventListener('click',e=>{
+  const id=e.target.dataset.del;if(!id)return;
+  db.phrases=db.phrases.filter(p=>p.id!==id);save();renderManage();render()});
+$('nAdd').onclick=()=>{
+  const t=$('nText').value.trim();if(!t){$('nText').focus();return}
+  db.phrases.push(mk(t,$('nTr').value.trim(),mTag));
+  $('nText').value='';$('nTr').value='';save();renderManage();render();$('nText').focus();toast('Frase adicionada.')};
+$('nTagAdd').onclick=()=>{
+  const n=$('nTagName').value.trim();if(!n)return;
+  if(!db.tags.includes(n))db.tags.push(n);
+  $('nTagName').value='';mTag=n;save();renderManage();render();toast(`Tag “${n}” criada.`)};
+$('mTag').onchange=e=>{mTag=e.target.value;renderManage()};
+$('mTagDel').onclick=()=>{
+  const n=db.phrases.filter(p=>p.tag===mTag).length;
+  if(!confirm(`Excluir a tag “${mTag}” e ${n} frase(s) vinculada(s)? Esta ação não pode ser desfeita.`))return;
+  db.phrases=db.phrases.filter(p=>p.tag!==mTag);
+  db.tags=db.tags.filter(t=>t!==mTag);
+  if(!db.tags.length)db.tags.push('Geral');
+  if(filter===mTag)filter='all';
+  idx=0;hintOn=false;save();renderManage();render();toast('Tag e frases excluídas.')};
+
+/* eventos */
+$('spk').onclick=speak;
+$('chk').onclick=check;
+$('prev').onclick=()=>go(-1);$('next').onclick=()=>go(1);
+$('redo').onclick=()=>{const p=list()[idx];if(!p)return;p.status=null;p.answer='';save();render();$('ans').focus()};
+$('hint').onclick=()=>{hintOn=!hintOn;render()};
+$('tagSel').onchange=e=>{filter=e.target.value;pin=null;idx=0;hintOn=false;render()};
+$('modeSel').onchange=e=>{mode=e.target.value;pin=null;idx=0;hintOn=false;render()};
+$('speed').onclick=()=>{const s=[.75,1,1.25,1.5];speed=s[(s.indexOf(speed)+1)%s.length];$('speed').textContent=speed+'x'};
+$('bBackup').onclick=()=>$('dBackup').showModal();
+$('bManage').onclick=()=>{if(filter!=='all')mTag=filter;renderManage();$('dManage').showModal()};
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+$('ans').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();check()}});
+document.addEventListener('keydown',e=>{
+  if(document.querySelector('dialog[open]'))return;
+  if(e.ctrlKey&&e.key.toLowerCase()==='p'){e.preventDefault();speak();return}
+  if(e.code==='Space'&&!/^(TEXTAREA|INPUT|SELECT|BUTTON)$/.test(e.target.tagName)){e.preventDefault();speak()}});
+render();
 </script>
 </body>
 </html>
