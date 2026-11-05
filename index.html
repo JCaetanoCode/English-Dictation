@@ -6,7 +6,8 @@
 <title>English Dictation</title>
 <style>
 :root{--bg:#0f172a;--hd:#1e293b;--card:#1e293b;--bd:#334155;--tx:#e2e8f0;--mut:#94a3b8;--pri:#6366f1;--ok:#4ade80;--okbg:#06281a;--er:#fb7185;--erbg:#3b0f1c;--in:#0f172a;color-scheme:dark}
-@media (prefers-color-scheme:light){:root{--bg:#f1f5f9;--hd:#fff;--card:#fff;--bd:#cbd5e1;--tx:#0f172a;--mut:#64748b;--ok:#15803d;--okbg:#dcfce7;--er:#be123c;--erbg:#ffe4e6;--in:#f8fafc;color-scheme:light}}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f1f5f9;--hd:#fff;--card:#fff;--bd:#cbd5e1;--tx:#0f172a;--mut:#64748b;--ok:#15803d;--okbg:#dcfce7;--er:#be123c;--erbg:#ffe4e6;--in:#f8fafc;color-scheme:light}}
+:root[data-theme="light"]{--bg:#f1f5f9;--hd:#fff;--card:#fff;--bd:#cbd5e1;--tx:#0f172a;--mut:#64748b;--ok:#15803d;--okbg:#dcfce7;--er:#be123c;--erbg:#ffe4e6;--in:#f8fafc;color-scheme:light}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:var(--bg);color:var(--tx);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
 header{background:var(--hd);border-bottom:1px solid var(--bd);padding:10px 16px}
@@ -71,7 +72,7 @@ footer{text-align:center;color:var(--mut);font-size:11px;padding:24px 0 calc(24p
 <body>
 <header><div class="hd">
   <div class="brand"><b>English Dictation</b><small>Prática de listening e escrita</small></div>
-  <div><button class="btn" id="bBackup">Dados &amp; backup</button> <button class="btn pri" id="bManage">Gerenciar frases</button></div>
+  <div><button class="btn" id="bTheme" aria-label="Alternar tema claro e escuro"></button> <button class="btn" id="bBackup">Dados &amp; backup</button> <button class="btn pri" id="bManage">Gerenciar frases</button></div>
 </div></header>
 
 <main><div class="card" id="card">
@@ -322,6 +323,15 @@ document.addEventListener('keydown',e=>{
   if(document.querySelector('dialog[open]'))return;
   if(e.ctrlKey&&e.key.toLowerCase()==='p'){e.preventDefault();speak();return}
   if(e.code==='Space'&&!/^(TEXTAREA|INPUT|SELECT|BUTTON)$/.test(e.target.tagName)){e.preventDefault();speak()}});
+/* tema */
+const root=document.documentElement;
+const curTheme=()=>root.dataset.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
+function setTheme(t,persist){
+  root.dataset.theme=t;$('bTheme').textContent=t==='dark'?'☀ Claro':'☾ Escuro';
+  if(persist)try{localStorage.setItem(KEY+'.theme',t)}catch(e){}}
+try{const t=localStorage.getItem(KEY+'.theme');if(t==='dark'||t==='light')root.dataset.theme=t}catch(e){}
+setTheme(curTheme());
+$('bTheme').onclick=()=>setTheme(curTheme()==='dark'?'light':'dark',true);
 render();
 </script>
 </body>
