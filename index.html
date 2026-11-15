@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>English Dictation</title>
 <style>
 :root{--bg:#0f172a;--hd:#1e293b;--card:#1e293b;--bd:#334155;--tx:#e2e8f0;--mut:#94a3b8;--pri:#6366f1;--ok:#4ade80;--okbg:#06281a;--er:#fb7185;--erbg:#3b0f1c;--in:#0f172a;color-scheme:dark}
@@ -67,12 +67,39 @@ input[type=text],.f{background:var(--in);border:1px solid var(--bd);border-radiu
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--pri);color:#fff;border-radius:8px;padding:9px 16px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;z-index:99}
 .toast.show{opacity:1}
 footer{text-align:center;color:var(--mut);font-size:11px;padding:24px 0 calc(24px + env(safe-area-inset-bottom,0px))}
+.dock,.m{display:none}
+.dock[hidden]{display:none!important}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--bd)}
+.spkb{flex:0 0 52px;height:48px;border:0;border-radius:12px;background:var(--pri);color:#fff;font-size:22px}
+.spkb.on{animation:pulse .8s infinite alternate}
+.chkb{flex:1;height:48px;border:0;border-radius:12px;background:var(--pri);color:#fff;font-weight:700}
+.chkb:disabled{background:var(--bd);color:var(--mut);cursor:not-allowed}
+@media (max-width:600px){
+  header{padding:5px 10px}
+  .hd{gap:6px}
+  .brand small,.d{display:none}
+  .m{display:inline}
+  .brand b{font-size:11px;color:var(--mut);font-weight:600}
+  .btn{padding:5px 8px;font-size:11px}
+  main{margin:8px auto 0;padding:0 8px calc(76px + env(safe-area-inset-bottom,0px))}
+  .card{padding:12px;border-radius:12px}
+  .bar{margin-bottom:8px}
+  .sel{max-width:120px}
+  .spk,.chk,#kb,footer{display:none}
+  .dock{display:flex}
+  .stats{margin:8px 0 4px}
+  .hint{margin-bottom:6px}
+  textarea{min-height:44px;resize:none;overflow:hidden;font-size:16px;padding:9px 12px}
+  .res{margin-top:10px;padding:10px}
+  .nav{margin-top:12px;padding-top:12px}
+  .toast{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+}
 </style>
 </head>
 <body>
 <header><div class="hd">
   <div class="brand"><b>English Dictation</b><small>Prática de listening e escrita</small></div>
-  <div><button class="btn" id="bTheme" aria-label="Alternar tema claro e escuro"></button> <button class="btn" id="bBackup">Dados &amp; backup</button> <button class="btn pri" id="bManage">Gerenciar frases</button></div>
+  <div><button class="btn" id="bTheme" aria-label="Alternar tema claro e escuro"></button> <button class="btn" id="bBackup"><span class="d">Dados &amp; backup</span><span class="m">Backup</span></button> <button class="btn pri" id="bManage"><span class="d">Gerenciar frases</span><span class="m">Frases</span></button></div>
 </div></header>
 
 <main><div class="card" id="card">
@@ -84,12 +111,12 @@ footer{text-align:center;color:var(--mut);font-size:11px;padding:24px 0 calc(24p
   <div id="empty" class="empty" hidden>Nenhuma frase nesta tag. Adicione frases em “Gerenciar frases” ou importe um arquivo em “Dados &amp; backup”.</div>
   <div id="work">
     <button class="spk" id="spk" aria-label="Ouvir frase">&#128266;</button>
-    <div class="keys">[ Espaço / Ctrl+P ]</div>
+    <div class="keys" id="kb">[ Espaço / Ctrl+P ]</div>
     <div class="stats"><span class="st a">Acertos: <b id="nOk">0</b></span><span class="st e">Erros: <b id="nEr">0</b></span></div>
     <div class="stats" id="panel" style="margin-top:0"></div>
     <div class="keys" id="badge" style="margin-bottom:8px"></div>
     <button class="hint" id="hint">Mostrar tradução</button>
-    <textarea id="ans" placeholder="Digite o que você ouviu em inglês…" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+    <textarea id="ans" rows="1" placeholder="Digite o que você ouviu em inglês…" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
     <div id="res"></div>
     <button class="chk" id="chk">Verificar resposta (Enter)</button>
     <div class="nav">
@@ -100,6 +127,7 @@ footer{text-align:center;color:var(--mut);font-size:11px;padding:24px 0 calc(24p
   </div>
 </div></main>
 <footer>English Dictation · ferramenta de estudo individual</footer>
+<div class="dock" id="dock"><button class="spkb" aria-label="Ouvir frase">&#128266;</button><button class="chkb">Verificar resposta</button></div>
 
 <dialog id="dBackup">
   <div class="hdm"><h2>Dados &amp; backup</h2><button class="btn" data-close>Fechar</button></div>
@@ -137,7 +165,7 @@ function seed(){return{version:1,tags:['Geral','Cotidiano'],phrases:[
 const MASTER=3,INT=[3,7,15,30],DAY=864e5,LBL={new:'Nova',learn:'Aprendendo',dom:'Dominada'};
 const st=p=>p.hits+p.miss===0?'new':p.streak>=MASTER?'dom':'learn';
 const dueNow=p=>st(p)==='dom'&&(!p.due||p.due<=Date.now());
-const MODES={pend:p=>st(p)!=='dom',err:p=>st(p)==='learn'&&p.miss>0,rev:dueNow,dom:p=>st(p)==='dom'};
+const MODES={pend:p=>st(p)!=='dom',err:p=>p.miss>0&&p.streak===0,rev:dueNow,dom:p=>st(p)==='dom'};
 let db=load(),filter='all',mode='pend',pin=null,idx=0,speed=1,hintOn=false,voices=[];
 function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&Array.isArray(r.phrases))return fix(r)}catch(e){}return seed()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
@@ -172,11 +200,11 @@ function render(){
   $('prog').style.width=L.length?((idx+1)/L.length*100)+'%':'0';
   $('count').textContent=L.length?`Frase ${idx+1} de ${L.length}`:'Sem frases';
   const T=db.phrases.filter(inTag),c=k=>T.filter(x=>st(x)===k).length;
-  $('nOk').textContent=T.reduce((s,x)=>s+x.hits,0);
-  $('nEr').textContent=T.reduce((s,x)=>s+x.miss,0);
+  $('nOk').textContent=T.filter(x=>x.streak>0).length;
+  $('nEr').textContent=T.filter(x=>x.miss>0&&x.streak===0).length;
   $('panel').innerHTML=[['Novas',c('new')],['Aprendendo',c('learn')],['Dominadas',c('dom')],['Para revisar',T.filter(dueNow).length]].map(([l,n])=>`<span class="pill">${l}: <b>${n}</b></span>`).join('');
   $('empty').textContent=db.phrases.length?'Nenhuma frase neste modo. Troque o modo de estudo ou a tag.':'Nenhuma frase cadastrada. Adicione em “Gerenciar frases” ou importe um arquivo em “Dados & backup”.';
-  $('empty').hidden=!!p;$('work').hidden=!p;
+  $('empty').hidden=!!p;$('work').hidden=!p;$('dock').hidden=!p;
   if(!p)return;
   const s=st(p);
   $('badge').textContent=`${LBL[s]} · ${p.hits} acertos · ${p.miss} erros`+(s==='dom'?(dueNow(p)?' · revisão pendente':` · revisão em ${Math.ceil((p.due-Date.now())/DAY)}d`):'');
@@ -199,7 +227,8 @@ function render(){
     if(p.translation)box.appendChild(el('div',null,'Tradução: '+p.translation));
     res.appendChild(box);
   }else{a.value='';a.disabled=false}
-  $('chk').disabled=!!p.status;
+  fit();
+  document.querySelectorAll('.chk,.chkb').forEach(b=>b.disabled=!!p.status);
   $('prev').disabled=idx===0;$('next').disabled=idx>=L.length-1;
 }
 function check(){
@@ -226,12 +255,19 @@ function speak(){
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(p.text);u.lang='en-US';u.rate=speed;
   const v=voices.find(v=>v.name===$('voice').value);if(v){u.voice=v;u.lang=v.lang}
-  const b=$('spk');b.classList.add('on');u.onend=u.onerror=()=>b.classList.remove('on');
+  const bs=document.querySelectorAll('.spk,.spkb');bs.forEach(b=>b.classList.add('on'));u.onend=u.onerror=()=>bs.forEach(b=>b.classList.remove('on'));
   speechSynthesis.speak(u)}
 if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
 
 /* download / upload */
-function download(name,text,type){
+async function download(name,text,type){
+  if(window.claude&&claude.use){
+    try{
+      const dl=await claude.use('downloads');
+      if(!dl){toast('Download indisponível nesta visualização.');return}
+      await dl.save({filename:name,data:text});toast('Arquivo salvo.');
+    }catch(e){toast(e&&e.code==='declined'?'Download cancelado.':'Não foi possível salvar o arquivo.')}
+    return}
   const a=el('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;
   document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 const stamp=()=>new Date().toISOString().slice(0,10);
@@ -309,6 +345,10 @@ $('mTagDel').onclick=()=>{
 /* eventos */
 $('spk').onclick=speak;
 $('chk').onclick=check;
+document.querySelectorAll('.spkb').forEach(b=>b.onclick=speak);
+document.querySelectorAll('.chkb').forEach(b=>b.onclick=check);
+$('dock').addEventListener('pointerdown',e=>e.preventDefault());
+$('dock').addEventListener('mousedown',e=>e.preventDefault());
 $('prev').onclick=()=>go(-1);$('next').onclick=()=>go(1);
 $('redo').onclick=()=>{const p=list()[idx];if(!p)return;p.status=null;p.answer='';save();render();$('ans').focus()};
 $('hint').onclick=()=>{hintOn=!hintOn;render()};
@@ -331,6 +371,14 @@ function setTheme(t,persist){
   if(persist)try{localStorage.setItem(KEY+'.theme',t)}catch(e){}}
 try{const t=localStorage.getItem(KEY+'.theme');if(t==='dark'||t==='light')root.dataset.theme=t}catch(e){}
 setTheme(curTheme());
+/* celular: campo cresce com o texto; barra sobe com o teclado */
+const mq=matchMedia('(max-width:600px)');
+function fit(){const a=$('ans');a.style.height='';if(mq.matches)a.style.height=(a.scrollHeight+4)+'px'}
+$('ans').addEventListener('input',fit);
+mq.addEventListener('change',fit);
+const vv=window.visualViewport;
+function dockPos(){if(!vv)return;const off=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);$('dock').style.transform=off?`translateY(${-off}px)`:''}
+if(vv){vv.addEventListener('resize',dockPos);vv.addEventListener('scroll',dockPos)}
 $('bTheme').onclick=()=>setTheme(curTheme()==='dark'?'light':'dark',true);
 render();
 </script>
