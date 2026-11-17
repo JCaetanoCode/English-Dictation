@@ -67,6 +67,22 @@ input[type=text],.f{background:var(--in);border:1px solid var(--bd);border-radiu
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--pri);color:#fff;border-radius:8px;padding:9px 16px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;z-index:99}
 .toast.show{opacity:1}
 footer{text-align:center;color:var(--mut);font-size:11px;padding:24px 0 calc(24px + env(safe-area-inset-bottom,0px))}
+[hidden]{display:none!important}
+.seg{display:flex;gap:4px;background:var(--in);border:1px solid var(--bd);border-radius:10px;padding:3px;margin-bottom:12px}
+.seg button{flex:1;border:0;background:none;border-radius:7px;padding:6px 4px;font-size:12px;font-weight:600;color:var(--mut)}
+.seg button.on{background:var(--pri);color:#fff}
+.pr{background:var(--in);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px;font-size:16px;font-weight:600;text-align:center}
+.fc{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;background:var(--in);border:2px solid var(--bd);border-radius:14px;padding:18px;font-size:19px;font-weight:600;cursor:pointer;user-select:none}
+.fc small{font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.fc.back{border-color:var(--pri)}
+.fc.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+.fc.err{background:var(--erbg);border-color:var(--er);color:var(--er)}
+#fcBtns{margin-top:12px}
+.spk:disabled,.spkb:disabled{opacity:.35;cursor:not-allowed}
+.fb{flex:1;height:48px;border:0;border-radius:12px;font-weight:700}
+.fb.no{background:var(--in);color:var(--tx);border:1px solid var(--bd)}
+.fb.yes{background:var(--pri);color:#fff}
+[data-ex=rev] #hint,[data-ex=flash] #hint,[data-ex=flash] #ans,[data-ex=flash] #res,[data-ex=flash] .chk{display:none}
 .dock,.m{display:none}
 .dock[hidden]{display:none!important}
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:20;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--bd)}
@@ -86,6 +102,7 @@ footer{text-align:center;color:var(--mut);font-size:11px;padding:24px 0 calc(24p
   .bar{margin-bottom:8px}
   .sel{max-width:120px}
   .spk,.chk,#kb,footer{display:none}
+  #fcBtns{display:none!important}
   .dock{display:flex}
   .stats{margin:8px 0 4px}
   .hint{margin-bottom:6px}
@@ -104,6 +121,7 @@ footer{text-align:center;color:var(--mut);font-size:11px;padding:24px 0 calc(24p
 
 <main><div class="card" id="card">
   <div class="bar"><i id="prog"></i></div>
+  <div class="seg" id="seg"><button data-ex="dict" class="on">Ditado</button><button data-ex="rev">Tradução</button><button data-ex="flash">Flashcards</button></div>
   <div class="row">
     <div class="row"><span class="pill" id="count"></span><select class="sel" id="tagSel" aria-label="Filtrar por tag"></select><select class="sel" id="modeSel" aria-label="Modo de estudo"><option value="pend">Pendentes</option><option value="err">Só erros</option><option value="rev">Revisão</option><option value="dom">Dominadas</option></select></div>
     <div class="row"><button class="pill" id="speed" title="Velocidade">1x</button><select class="sel" id="voice" aria-label="Voz"></select></div>
@@ -115,9 +133,11 @@ footer{text-align:center;color:var(--mut);font-size:11px;padding:24px 0 calc(24p
     <div class="stats"><span class="st a">Acertos: <b id="nOk">0</b></span><span class="st e">Erros: <b id="nEr">0</b></span></div>
     <div class="stats" id="panel" style="margin-top:0"></div>
     <div class="keys" id="badge" style="margin-bottom:8px"></div>
+    <div class="pr" id="pr" hidden></div>
     <button class="hint" id="hint">Mostrar tradução</button>
     <textarea id="ans" rows="1" placeholder="Digite o que você ouviu em inglês…" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
     <div id="res"></div>
+    <div id="fl" hidden><div class="fc" id="fc" role="button" tabindex="0" aria-label="Virar cartão"><small id="fcLab"></small><div id="fcTxt"></div></div><div class="row" id="fcBtns" hidden><button class="btn" id="fNo">Não lembrei</button><button class="btn pri" id="fYes">Lembrei</button></div></div>
     <button class="chk" id="chk">Verificar resposta (Enter)</button>
     <div class="nav">
       <button class="btn" id="prev">&larr; Anterior</button>
@@ -127,7 +147,7 @@ footer{text-align:center;color:var(--mut);font-size:11px;padding:24px 0 calc(24p
   </div>
 </div></main>
 <footer>English Dictation · ferramenta de estudo individual</footer>
-<div class="dock" id="dock"><button class="spkb" aria-label="Ouvir frase">&#128266;</button><button class="chkb">Verificar resposta</button></div>
+<div class="dock" id="dock"><button class="spkb" aria-label="Ouvir frase">&#128266;</button><button class="chkb">Verificar resposta</button><button class="fb no" hidden>Não lembrei</button><button class="fb yes" hidden>Lembrei</button></div>
 
 <dialog id="dBackup">
   <div class="hdm"><h2>Dados &amp; backup</h2><button class="btn" data-close>Fechar</button></div>
@@ -166,7 +186,7 @@ const MASTER=3,INT=[3,7,15,30],DAY=864e5,LBL={new:'Nova',learn:'Aprendendo',dom:
 const st=p=>p.hits+p.miss===0?'new':p.streak>=MASTER?'dom':'learn';
 const dueNow=p=>st(p)==='dom'&&(!p.due||p.due<=Date.now());
 const MODES={pend:p=>st(p)!=='dom',err:p=>p.miss>0&&p.streak===0,rev:dueNow,dom:p=>st(p)==='dom'};
-let db=load(),filter='all',mode='pend',pin=null,idx=0,speed=1,hintOn=false,voices=[];
+let db=load(),filter='all',mode='pend',ex='dict',flipId=null,pin=null,idx=0,speed=1,hintOn=false,voices=[];
 function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&Array.isArray(r.phrases))return fix(r)}catch(e){}return seed()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
 function fix(r){
@@ -174,7 +194,7 @@ function fix(r){
   const t=new Set(Array.isArray(r.tags)?r.tags:[]);r.phrases.forEach(p=>t.add(p.tag));if(!t.size)t.add('Geral');
   r.tags=[...t];r.version=1;return r}
 const inTag=p=>filter==='all'||p.tag===filter;
-const list=()=>db.phrases.filter(p=>inTag(p)&&(p.id===pin||MODES[mode](p)));
+const list=()=>db.phrases.filter(p=>inTag(p)&&(p.id===pin||MODES[mode](p))&&(ex==='dict'||p.translation));
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2600)}
 
 function words(s){return s.split(/\s+/).map(w=>({raw:w,n:norm(w)})).filter(w=>w.n)}
@@ -203,8 +223,9 @@ function render(){
   $('nOk').textContent=T.filter(x=>x.streak>0).length;
   $('nEr').textContent=T.filter(x=>x.miss>0&&x.streak===0).length;
   $('panel').innerHTML=[['Novas',c('new')],['Aprendendo',c('learn')],['Dominadas',c('dom')],['Para revisar',T.filter(dueNow).length]].map(([l,n])=>`<span class="pill">${l}: <b>${n}</b></span>`).join('');
-  $('empty').textContent=db.phrases.length?'Nenhuma frase neste modo. Troque o modo de estudo ou a tag.':'Nenhuma frase cadastrada. Adicione em “Gerenciar frases” ou importe um arquivo em “Dados & backup”.';
+  $('empty').textContent=db.phrases.length?'Nenhuma frase neste modo. Troque o modo de estudo ou a tag'+(ex!=='dict'?' (aqui só entram frases com tradução).':'.'):'Nenhuma frase cadastrada. Adicione em “Gerenciar frases” ou importe um arquivo em “Dados & backup”.';
   $('empty').hidden=!!p;$('work').hidden=!p;$('dock').hidden=!p;
+  document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.ex===ex));
   if(!p)return;
   const s=st(p);
   $('badge').textContent=`${LBL[s]} · ${p.hits} acertos · ${p.miss} erros`+(s==='dom'?(dueNow(p)?' · revisão pendente':` · revisão em ${Math.ceil((p.due-Date.now())/DAY)}d`):'');
@@ -229,15 +250,20 @@ function render(){
   }else{a.value='';a.disabled=false}
   fit();
   document.querySelectorAll('.chk,.chkb').forEach(b=>b.disabled=!!p.status);
+  view(p);
   $('prev').disabled=idx===0;$('next').disabled=idx>=L.length-1;
 }
-function check(){
-  const p=list()[idx],a=$('ans');
-  if(!p||p.status||!a.value.trim())return;
-  p.answer=a.value.trim();const ok=norm(p.answer)===norm(p.text);p.status=ok?'ok':'err';
+function grade(p,ok){
   if(ok){p.hits++;p.streak++;if(p.streak>=MASTER){p.due=Date.now()+INT[Math.min(p.streak-MASTER,INT.length-1)]*DAY;if(p.streak===MASTER)toast('Frase dominada! Primeira revisão em 3 dias.')}}
   else{p.miss++;p.streak=0;p.due=null}
   pin=p.id;
+}
+function check(){
+  if(ex==='flash'){const q=list()[idx];if(q&&!q.status&&flipId!==q.id){flipId=q.id;render()}return}
+  const p=list()[idx],a=$('ans');
+  if(!p||p.status||!a.value.trim())return;
+  p.answer=a.value.trim();const ok=norm(p.answer)===norm(p.text);p.status=ok?'ok':'err';
+  grade(p,ok);
   save();render();
 }
 function go(d){const t=list()[idx+d];if(!t)return;pin=null;idx=Math.max(0,list().indexOf(t));hintOn=false;render();if(!$('ans').disabled)$('ans').focus()}
@@ -250,7 +276,7 @@ function loadVoices(){
   voices.forEach(v=>{const o=el('option',null,`${v.name} (${v.lang})`);o.value=v.name;s.appendChild(o)});
   s.value=cur}
 function speak(){
-  const p=list()[idx];if(!p)return;
+  const p=list()[idx];if(!p||$('spk').disabled)return;
   if(!('speechSynthesis' in window)){toast('Seu navegador não suporta síntese de voz.');return}
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(p.text);u.lang='en-US';u.rate=speed;
@@ -349,6 +375,37 @@ document.querySelectorAll('.spkb').forEach(b=>b.onclick=speak);
 document.querySelectorAll('.chkb').forEach(b=>b.onclick=check);
 $('dock').addEventListener('pointerdown',e=>e.preventDefault());
 $('dock').addEventListener('mousedown',e=>e.preventDefault());
+function flashAns(ok){
+  const p=list()[idx];if(!p||p.status||flipId!==p.id)return;
+  grade(p,ok);p.status=ok?'ok':'err';save();flipId=null;
+  if(list()[idx+1])go(1);else render()}
+function view(p){
+  $('work').dataset.ex=ex;
+  $('pr').hidden=ex!=='rev';$('fl').hidden=ex!=='flash';
+  const done=!!p.status,fl=ex==='flash',flipped=flipId===p.id;
+  const off=ex==='rev'?!done:fl?!(flipped||done):false;
+  document.querySelectorAll('.spk,.spkb').forEach(b=>b.disabled=off);
+  $('ans').placeholder=ex==='rev'?'Escreva em inglês…':'Digite o que você ouviu em inglês…';
+  if(ex==='rev')$('pr').textContent=p.translation;
+  const cb=document.querySelector('.chkb');
+  cb.textContent=fl?(done?'Respondida':'Mostrar resposta'):'Verificar resposta';
+  cb.hidden=fl&&flipped&&!done;
+  document.querySelectorAll('.fb').forEach(b=>b.hidden=!(fl&&flipped&&!done));
+  if(!fl)return;
+  const shown=flipped||done;
+  $('fcLab').textContent=shown?'English':'Português · toque para virar';
+  $('fcTxt').textContent=shown?p.text:p.translation;
+  $('fc').className='fc'+(shown?' back':'')+(done?(p.status==='ok'?' ok':' err'):'');
+  $('fcBtns').hidden=!(flipped&&!done)}
+document.querySelectorAll('#fNo,.fb.no').forEach(b=>b.onclick=()=>flashAns(false));
+document.querySelectorAll('#fYes,.fb.yes').forEach(b=>b.onclick=()=>flashAns(true));
+$('fc').onclick=()=>check();
+document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{
+  ex=b.dataset.ex;pin=null;idx=0;flipId=null;hintOn=false;
+  db.phrases.forEach(x=>{x.status=null;x.answer=''});
+  const n=db.phrases.filter(x=>inTag(x)&&!x.translation).length;
+  if(ex!=='dict'&&n)toast(`${n} frase(s) sem tradução ficam de fora.`);
+  render();if(ex==='rev')$('ans').focus()});
 $('prev').onclick=()=>go(-1);$('next').onclick=()=>go(1);
 $('redo').onclick=()=>{const p=list()[idx];if(!p)return;p.status=null;p.answer='';save();render();$('ans').focus()};
 $('hint').onclick=()=>{hintOn=!hintOn;render()};
